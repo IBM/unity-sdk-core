@@ -140,7 +140,7 @@ namespace IBM.Cloud.SDK
         /// <typeparam name="T">Type of the returned object.</typeparam>
         /// <param name="response">The returned DetailedResponse.</param>
         /// <param name="customData">user defined custom data including raw json.</param>
-        public delegate void Callback<T>(DetailedResponse<T> response, IBMError error, Dictionary<string, object> customData);
+        public delegate void Callback<T>(DetailedResponse<T> response, IBMError error);
         #endregion
 
         #region Constructors
@@ -245,7 +245,7 @@ namespace IBM.Cloud.SDK
             if (!string.IsNullOrEmpty(_userAcessToken))
             {
                 // 1. use user-managed token
-                OnGetToken(new DetailedResponse<IamTokenData>() { Result = new IamTokenData() { AccessToken = _userAcessToken } }, new IBMError(), new Dictionary<string, object>());
+                OnGetToken(new DetailedResponse<IamTokenData>() { Result = new IamTokenData() { AccessToken = _userAcessToken } }, new IBMError());
             }
             else if (!string.IsNullOrEmpty(_iamTokenData.AccessToken) || IsRefreshTokenExpired())
             {
@@ -261,11 +261,11 @@ namespace IBM.Cloud.SDK
             {
                 //  4. use valid managed token
 
-                OnGetToken(new DetailedResponse<IamTokenData>() { Result = new IamTokenData() { AccessToken = _iamTokenData.AccessToken } }, new IBMError(), new Dictionary<string, object>());
+                OnGetToken(new DetailedResponse<IamTokenData>() { Result = new IamTokenData() { AccessToken = _iamTokenData.AccessToken } }, new IBMError());
             }
         }
 
-        private void OnGetToken(DetailedResponse<IamTokenData> response, IBMError error, Dictionary<string, object> customData)
+        private void OnGetToken(DetailedResponse<IamTokenData> response, IBMError error)
         {
             SaveTokenInfo(response.Result);
         }
@@ -324,8 +324,10 @@ namespace IBM.Cloud.SDK
             DetailedResponse<IamTokenData> response = new DetailedResponse<IamTokenData>();
             response.Result = new IamTokenData();
             fsData data = null;
-            Dictionary<string, object> customData = ((RequestIamTokenRequest)req).CustomData;
-            customData.Add(Constants.String.RESPONSE_HEADERS, resp.Headers);
+            foreach (KeyValuePair<string, string> kvp in resp.Headers)
+            {
+                response.Headers.Add(kvp.Key, kvp.Value);
+            }
 
             if (resp.Success)
             {
@@ -340,7 +342,7 @@ namespace IBM.Cloud.SDK
                     if (!r.Succeeded)
                         throw new IBMException(r.FormattedMessages);
 
-                    customData.Add("json", data);
+                    response.Response = data.ToString();
                 }
                 catch (Exception e)
                 {
@@ -350,7 +352,7 @@ namespace IBM.Cloud.SDK
             }
 
             if (((RequestIamTokenRequest)req).Callback != null)
-                ((RequestIamTokenRequest)req).Callback(response, resp.Error, customData);
+                ((RequestIamTokenRequest)req).Callback(response, resp.Error);
         }
         #endregion
 
@@ -405,8 +407,10 @@ namespace IBM.Cloud.SDK
             DetailedResponse<IamTokenData> response = new DetailedResponse<IamTokenData>();
             response.Result = new IamTokenData();
             fsData data = null;
-            Dictionary<string, object> customData = ((RefreshIamTokenRequest)req).CustomData;
-            customData.Add(Constants.String.RESPONSE_HEADERS, resp.Headers);
+            foreach (KeyValuePair<string, string> kvp in resp.Headers)
+            {
+                response.Headers.Add(kvp.Key, kvp.Value);
+            }
 
             if (resp.Success)
             {
@@ -421,7 +425,7 @@ namespace IBM.Cloud.SDK
                     if (!r.Succeeded)
                         throw new IBMException(r.FormattedMessages);
 
-                    customData.Add("json", data);
+                    response.Response = data.ToString();
                 }
                 catch (Exception e)
                 {
@@ -431,7 +435,7 @@ namespace IBM.Cloud.SDK
             }
 
             if (((RefreshIamTokenRequest)req).Callback != null)
-                ((RefreshIamTokenRequest)req).Callback(response, resp.Error, customData);
+                ((RefreshIamTokenRequest)req).Callback(response, resp.Error);
         }
         #endregion
 

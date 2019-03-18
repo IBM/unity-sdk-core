@@ -34,6 +34,8 @@ namespace IBM.Cloud.SDK
         /// </summary>
         public T Result { get; set; }
 
+        public string Response { get; set; }
+
         public DetailedResponse()
         {
             if(Headers == null)
