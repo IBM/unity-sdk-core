@@ -30,9 +30,5 @@ namespace IBM.Cloud.SDK
         /// The success callback.
         /// </summary>
         public Callback<T> Callback { get; set; }
-        /// <summary>
-        /// Custom data.
-        /// </summary>
-        public Dictionary<string, object> CustomData { get; set; }
     }
 }

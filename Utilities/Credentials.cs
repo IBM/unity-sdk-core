@@ -139,7 +139,6 @@ namespace IBM.Cloud.SDK
         /// </summary>
         /// <typeparam name="T">Type of the returned object.</typeparam>
         /// <param name="response">The returned DetailedResponse.</param>
-        /// <param name="customData">user defined custom data including raw json.</param>
         public delegate void Callback<T>(DetailedResponse<T> response, IBMError error);
         #endregion
 
@@ -278,9 +277,8 @@ namespace IBM.Cloud.SDK
         /// </summary>
         /// <param name="callback">The request callback.</param>
         /// <param name="error"> The request error.</param>
-        /// <param name="customData">Dictionary of custom data.</param>
         /// <returns></returns>
-        public bool RequestIamToken(Callback<IamTokenData> callback, Dictionary<string, object> customData = null)
+        public bool RequestIamToken(Callback<IamTokenData> callback)
         {
             if (callback == null)
                 throw new ArgumentNullException("successCallback");
@@ -297,14 +295,6 @@ namespace IBM.Cloud.SDK
             req.Headers.Add("Authorization", "Basic Yng6Yng=");
             req.OnResponse = OnRequestIamTokenResponse;
             req.DisableSslVerification = DisableSslVerification;
-            req.CustomData = customData == null ? new Dictionary<string, object>() : customData;
-            if (req.CustomData.ContainsKey(Constants.String.CUSTOM_REQUEST_HEADERS))
-            {
-                foreach (KeyValuePair<string, string> kvp in req.CustomData[Constants.String.CUSTOM_REQUEST_HEADERS] as Dictionary<string, string>)
-                {
-                    req.Headers.Add(kvp.Key, kvp.Value);
-                }
-            }
             req.Forms = new Dictionary<string, RESTConnector.Form>();
             req.Forms["grant_type"] = new RESTConnector.Form("urn:ibm:params:oauth:grant-type:apikey");
             req.Forms["apikey"] = new RESTConnector.Form(_iamApiKey);
@@ -315,7 +305,6 @@ namespace IBM.Cloud.SDK
 
         private class RequestIamTokenRequest : RESTConnector.Request
         {
-            public Dictionary<string, object> CustomData { get; set; }
             public Callback<IamTokenData> Callback { get; set; }
         }
 
@@ -362,9 +351,8 @@ namespace IBM.Cloud.SDK
         /// </summary>
         /// <param name="callback">The success callback.</param>
         /// <param name="failCallback">The fail callback.</param>
-        /// <param name="customData">Dictionary of custom data.</param>
         /// <returns></returns>
-        public bool RefreshIamToken(Callback<IamTokenData> callback, Dictionary<string, object> customData = null)
+        public bool RefreshIamToken(Callback<IamTokenData> callback)
         {
             if (callback == null)
                 throw new ArgumentNullException("callback");
@@ -381,14 +369,6 @@ namespace IBM.Cloud.SDK
             req.Headers.Add("Authorization", "Basic Yng6Yng=");
             req.OnResponse = OnRefreshIamTokenResponse;
             req.DisableSslVerification = DisableSslVerification;
-            req.CustomData = customData == null ? new Dictionary<string, object>() : customData;
-            if (req.CustomData.ContainsKey(Constants.String.CUSTOM_REQUEST_HEADERS))
-            {
-                foreach (KeyValuePair<string, string> kvp in req.CustomData[Constants.String.CUSTOM_REQUEST_HEADERS] as Dictionary<string, string>)
-                {
-                    req.Headers.Add(kvp.Key, kvp.Value);
-                }
-            }
             req.Forms = new Dictionary<string, RESTConnector.Form>();
             req.Forms["grant_type"] = new RESTConnector.Form("refresh_token");
             req.Forms["refresh_token"] = new RESTConnector.Form(_iamTokenData.RefreshToken);
@@ -399,7 +379,6 @@ namespace IBM.Cloud.SDK
         private class RefreshIamTokenRequest : RESTConnector.Request
         {
             public Callback<IamTokenData> Callback { get; set; }
-            public Dictionary<string, object> CustomData { get; set; }
         }
 
         private void OnRefreshIamTokenResponse(RESTConnector.Request req, RESTConnector.Response resp)

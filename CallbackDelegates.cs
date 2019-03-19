@@ -24,6 +24,5 @@ namespace IBM.Cloud.SDK
     /// </summary>
     /// <typeparam name="T">Type of the returned object.</typeparam>
     /// <param name="response">The returned DetailedResponse.</param>
-    /// <param name="customData">user defined custom data including raw json.</param>
     public delegate void Callback<T>(DetailedResponse<T> response, IBMError error);
 }

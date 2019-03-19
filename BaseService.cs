@@ -17,6 +17,7 @@
 
 using IBM.Cloud.SDK.Utilities;
 using System;
+using System.Collections.Generic;
 
 namespace IBM.Cloud.SDK
 {
@@ -24,6 +25,7 @@ namespace IBM.Cloud.SDK
     {
         protected Credentials credentials;
         protected string url;
+        protected Dictionary<string, string> customRequestHeaders = new Dictionary<string, string>();
 
         public BaseService(string serviceId)
         {
@@ -75,5 +77,37 @@ namespace IBM.Cloud.SDK
         public BaseService(string versionDate, Credentials credentials, string serviceId) { }
 
         public BaseService(Credentials credentials, string serviceId) { }
+
+        public void WithHeader(string name, string value)
+        {
+            if (!customRequestHeaders.ContainsKey(name))
+            {
+                customRequestHeaders.Add(name, value);
+            }
+            else
+            {
+                customRequestHeaders[name] = value;
+            }
+        }
+
+        public void WithHeaders(Dictionary<string, string> headers)
+        {
+            foreach (KeyValuePair<string, string> kvp in headers)
+            {
+                if (!customRequestHeaders.ContainsKey(kvp.Key))
+                {
+                    customRequestHeaders.Add(kvp.Key, kvp.Value);
+                }
+                else
+                {
+                    customRequestHeaders[kvp.Key] = kvp.Value;
+                }
+            }
+        }
+
+        protected void ClearCustomRequestHeaders()
+        {
+            customRequestHeaders = new Dictionary<string, string>();
+        }
     }
 }

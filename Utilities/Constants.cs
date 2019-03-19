@@ -49,18 +49,6 @@ namespace IBM.Cloud.SDK
             /// <exclude />
             public const string DebugDispalyQuality = "Quality: {0}";
             /// <summary>
-            /// Name for creating custom headers in CustomData.
-            /// </summary>
-            public const string CUSTOM_REQUEST_HEADERS = "request_headers";
-            /// <summary>
-            /// Name for accessing response headers in CustomData.
-            /// </summary>
-            public const string RESPONSE_HEADERS = "response_headers";
-            /// <summary>
-            /// Name for accessing json.
-            /// </summary>
-            public const string JSON = "json";
-            /// <summary>
             /// URL for IBM Cloud onboarding
             /// </summary>
             public const string IBM_CLOUD_URL = "http://console.bluemix.net/registration";
