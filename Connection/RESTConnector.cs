@@ -121,12 +121,10 @@ namespace IBM.Cloud.SDK.Connection
             /// <param name="contents">The binary data.</param>
             /// <param name="fileName">The filename of the binary data.</param>
             /// <param name="mimeType">The mime type of the data.</param>
-            public Form(System.IO.FileStream contents, string fileName = null, string mimeType = null)
+            public Form(System.IO.MemoryStream contents, string fileName = null, string mimeType = null)
             {
                 IsBinary = true;
-                System.IO.MemoryStream ms = new System.IO.MemoryStream();
-                contents.CopyTo(ms);
-                Contents = ms.ToArray();
+                Contents = contents.ToArray();
                 FileName = fileName;
                 MimeType = mimeType;
             }
