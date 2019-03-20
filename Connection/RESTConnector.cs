@@ -387,9 +387,9 @@ namespace IBM.Cloud.SDK.Connection
                     {
                         value = value.ToString().ToLower();
                     }
-                    else if (value is DateTime)
+                    else if (value is DateTime?)
                     {
-                        value = String.Format("{0:yyyy/MM/dd+HH:mm:ss}", value);
+                        value = String.Format("{0:yyyy-MM-ddThh:mm:ssZ}", value);//yyyy-MM-ddthh:mm:ssz
                     }
                     else if (value != null)
                     {
