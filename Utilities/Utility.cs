@@ -1257,6 +1257,13 @@ namespace IBM.Cloud.SDK.Utilities
             return output;
         }
         #endregion
+
+        #region DateTime? to String
+        public static string NullableDateTimeToString(this DateTime? dt, string format)
+        {
+            return dt == null ? "" : ((DateTime)dt).ToString(format);
+        }
+        #endregion
     }
 
     /// <summary>
