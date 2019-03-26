@@ -26,6 +26,9 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
+using MiniJSON;
 
 #if !NETFX_CORE
 using System.Net;
@@ -90,7 +93,7 @@ namespace IBM.Cloud.SDK.Connection
             public Dictionary<string, string> Headers { get; set; }
             #endregion
         };
-        
+
         /// <summary>
         /// Multi-part form data class.
         /// </summary>
@@ -485,7 +488,7 @@ namespace IBM.Cloud.SDK.Connection
                         method = req.HttpMethod
                     };
 
-                    if(req.HttpMethod == UnityWebRequest.kHttpVerbPOST)
+                    if (req.HttpMethod == UnityWebRequest.kHttpVerbPOST)
                     {
                         unityWebRequest.SetRequestHeader("Content-Type", "application/json");
                     }
@@ -568,11 +571,13 @@ namespace IBM.Cloud.SDK.Connection
                             break;
                     }
 
+                    string errorMessage = GetErrorMessage(unityWebRequest.downloadHandler.text);
+
                     error = new IBMError()
                     {
                         Url = url,
                         StatusCode = unityWebRequest.responseCode,
-                        ErrorMessage = unityWebRequest.error,
+                        ErrorMessage = errorMessage,
                         Response = unityWebRequest.downloadHandler.text,
                         ResponseHeaders = unityWebRequest.GetResponseHeaders()
                     };
@@ -628,6 +633,29 @@ namespace IBM.Cloud.SDK.Connection
             // reduce the connection count before we exit.
             _activeConnections -= 1;
             yield break;
+        }
+        #endregion
+
+        #region Get Error Message
+        public string GetErrorMessage(string error)
+        {
+            dynamic deserializedObject = Json.Deserialize(error);
+            if ((deserializedObject as Dictionary<string, object>).ContainsKey("errors"))
+            {
+                return deserializedObject["errors"][0]["message"];
+            }
+
+            if ((deserializedObject as Dictionary<string, object>).ContainsKey("error"))
+            {
+                return deserializedObject["error"];
+            }
+
+            if ((deserializedObject as Dictionary<string, object>).ContainsKey("message"))
+            {
+                return deserializedObject["message"];
+            }
+
+            return "Unknown error";
         }
         #endregion
     }
