@@ -4,7 +4,7 @@
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
 [![CLA assistant](https://cla-assistant.io/readme/badge/IBM/unity-sdk-core)](https://cla-assistant.io/IBM/unity-sdk-core)
 
-The IBM Cloud Unity SDK Core is a core project of Unity SDKs generated using the IBM OpenAPI SDK generator. Generated services should use this package as a submodule of their generate Unity SDK.
+The IBM Cloud Unity SDK Core is a core project of Unity SDKs generated using the IBM OpenAPI SDK generator. The core should be added to the **`Assets`** directory of your Unity project
 
 <details>
   <summary>Table of Contents</summary>
@@ -29,14 +29,9 @@ Ensure that you have the following prerequisites:
 * If using Unity 2018.2 or later you'll need to set **Scripting Runtime Version** and **Api Compatibility Level** in Build Settings to **.NET 4.x equivalent**. We need to access security options to enable TLS 1.2. 
 
 ## Getting the IBM Unity SDK Core and adding it to Unity
-The IBM Unity SDK Core is mean to be used as a submodule in other generated Unity SDKs. The selected SDK release will point to a particular commit of the IBM Unity SDK Core. Clone the SDK into your Unity project's Assets directory, and initalize and update submodules.
+You can get the latest SDK Core release by clicking [here][latest_release_core]. 
 
-```bash
-$ git clone [unity-sdk-url]
-$ cd [unity-sdk-directory]
-$ git submodule init
-$ git submodule update
-```
+The IBM Unity SDK Core is a dependency of Unity SDKs generated using the IBM OpenAPI SDK generator. It should be added to the  **`Assets`** directory of your Unity project. _Optional: rename the Core directory from `unity-sdk-core` to `IBMSdkCore`_.
 
 ## Questions
 
@@ -54,3 +49,4 @@ This library is licensed under Apache 2.0. Full license text is available in [LI
 See [CONTRIBUTING.md](.github/CONTRIBUTING.md).
 
 [get_unity]: https://unity3d.com/get-unity
+[latest_release_core: https://github.com/IBM/unity-sdk-core/releases/latest
