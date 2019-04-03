@@ -49,4 +49,4 @@ This library is licensed under Apache 2.0. Full license text is available in [LI
 See [CONTRIBUTING.md](.github/CONTRIBUTING.md).
 
 [get_unity]: https://unity3d.com/get-unity
-[latest_release_core: https://github.com/IBM/unity-sdk-core/releases/latest
+[latest_release_core]: https://github.com/IBM/unity-sdk-core/releases/latest
