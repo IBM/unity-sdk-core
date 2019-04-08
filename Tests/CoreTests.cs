@@ -50,5 +50,14 @@ namespace IBM.Cloud.SDK.Tests
             string errorMessage = restConnector.GetErrorMessage(json);
             Assert.IsTrue(errorMessage == "string");
         }
+
+        [Test]
+        public void GetErrorFromErrorMessage()
+        {
+            string json = "{\"code\":\"string\",\"errorMessage\":\"string\"}";
+            RESTConnector restConnector = new RESTConnector();
+            string errorMessage = restConnector.GetErrorMessage(json);
+            Assert.IsTrue(errorMessage == "string");
+        }
     }
 }

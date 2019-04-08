@@ -655,6 +655,11 @@ namespace IBM.Cloud.SDK.Connection
                 return deserializedObject["message"];
             }
 
+            if ((deserializedObject as Dictionary<string, object>).ContainsKey("errorMessage"))
+            {
+                return deserializedObject["errorMessage"];
+            }
+
             return "Unknown error";
         }
         #endregion
