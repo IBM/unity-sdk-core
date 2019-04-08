@@ -15,9 +15,9 @@
 *
 */
 
-using FullSerializer;
 using IBM.Cloud.SDK.Connection;
 using IBM.Cloud.SDK.Utilities;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -32,7 +32,6 @@ namespace IBM.Cloud.SDK
     public class Credentials
     {
         #region Private Data
-        private fsSerializer _serializer = new fsSerializer();
         private string _iamUrl;
         private IamTokenData _iamTokenData;
         private string _iamApiKey;
@@ -312,32 +311,22 @@ namespace IBM.Cloud.SDK
         {
             DetailedResponse<IamTokenData> response = new DetailedResponse<IamTokenData>();
             response.Result = new IamTokenData();
-            fsData data = null;
             foreach (KeyValuePair<string, string> kvp in resp.Headers)
             {
                 response.Headers.Add(kvp.Key, kvp.Value);
             }
+            response.StatusCode = resp.HttpResponseCode;
 
-            if (resp.Success)
+            try
             {
-                try
-                {
-                    fsResult r = fsJsonParser.Parse(Encoding.UTF8.GetString(resp.Data), out data);
-                    if (!r.Succeeded)
-                        throw new IBMException(r.FormattedMessages);
-
-                    object obj = response.Result;
-                    r = _serializer.TryDeserialize(data, obj.GetType(), ref obj);
-                    if (!r.Succeeded)
-                        throw new IBMException(r.FormattedMessages);
-
-                    response.Response = data.ToString();
-                }
-                catch (Exception e)
-                {
-                    Log.Error("TokenManager.OnRequestTokenResponse()", "Exception: {0}", e.ToString());
-                    resp.Success = false;
-                }
+                string json = Encoding.UTF8.GetString(resp.Data);
+                response.Result = JsonConvert.DeserializeObject<IamTokenData>(json);
+                response.Response = json;
+            }
+            catch (Exception e)
+            {
+                Log.Error("Credentials.OnRequestIamTokenResponse()", "Exception: {0}", e.ToString());
+                resp.Success = false;
             }
 
             if (((RequestIamTokenRequest)req).Callback != null)
@@ -385,32 +374,22 @@ namespace IBM.Cloud.SDK
         {
             DetailedResponse<IamTokenData> response = new DetailedResponse<IamTokenData>();
             response.Result = new IamTokenData();
-            fsData data = null;
             foreach (KeyValuePair<string, string> kvp in resp.Headers)
             {
                 response.Headers.Add(kvp.Key, kvp.Value);
             }
+            response.StatusCode = resp.HttpResponseCode;
 
-            if (resp.Success)
+            try
             {
-                try
-                {
-                    fsResult r = fsJsonParser.Parse(Encoding.UTF8.GetString(resp.Data), out data);
-                    if (!r.Succeeded)
-                        throw new IBMException(r.FormattedMessages);
-
-                    object obj = response.Result;
-                    r = _serializer.TryDeserialize(data, obj.GetType(), ref obj);
-                    if (!r.Succeeded)
-                        throw new IBMException(r.FormattedMessages);
-
-                    response.Response = data.ToString();
-                }
-                catch (Exception e)
-                {
-                    Log.Error("TokenManager.OnRefreshTokenResponse()", "Exception: {0}", e.ToString());
-                    resp.Success = false;
-                }
+                string json = Encoding.UTF8.GetString(resp.Data);
+                response.Result = JsonConvert.DeserializeObject<IamTokenData>(json);
+                response.Response = json;
+            }
+            catch (Exception e)
+            {
+                Log.Error("Credentials.OnRefreshIamTokenResponse()", "Exception: {0}", e.ToString());
+                resp.Success = false;
             }
 
             if (((RefreshIamTokenRequest)req).Callback != null)
@@ -547,13 +526,12 @@ namespace IBM.Cloud.SDK
     /// <summary>
     /// Vcap credentials object.
     /// </summary>
-    [fsObject]
     public class VcapCredentials
     {
         /// <summary>
         /// List of credentials by service name.
         /// </summary>
-        [fsProperty("VCAP_SERVICES")]
+        [JsonProperty("VCAP_SERVICES", NullValueHandling = NullValueHandling.Ignore)]
         public Dictionary<string, List<VcapCredential>> VCAP_SERVICES { get; set; }
 
         /// <summary>
@@ -580,52 +558,49 @@ namespace IBM.Cloud.SDK
     /// <summary>
     /// The Credential to a single service.
     /// </summary>
-    [fsObject]
     public class VcapCredential
     {
-        [fsProperty("name")]
+        [JsonProperty("name", NullValueHandling = NullValueHandling.Ignore)]
         public string Name { get; set; }
-        [fsProperty("label")]
+        [JsonProperty("label", NullValueHandling = NullValueHandling.Ignore)]
         public string Label { get; set; }
-        [fsProperty("plan")]
+        [JsonProperty("plan", NullValueHandling = NullValueHandling.Ignore)]
         public string Plan { get; set; }
-        [fsProperty("credentials")]
+        [JsonProperty("credentials", NullValueHandling = NullValueHandling.Ignore)]
         public Credential Credentials { get; set; }
     }
 
     /// <summary>
     /// The Credentials.
     /// </summary>
-    [fsObject]
     public class Credential
     {
-        [fsProperty("url")]
+        [JsonProperty("url", NullValueHandling = NullValueHandling.Ignore)]
         public string Url { get; set; }
-        [fsProperty("username")]
+        [JsonProperty("username", NullValueHandling = NullValueHandling.Ignore)]
         public string Username { get; set; }
-        [fsProperty("password")]
+        [JsonProperty("password", NullValueHandling = NullValueHandling.Ignore)]
         public string Password { get; set; }
-        [fsProperty("workspace_id")]
+        [JsonProperty("workspace_id", NullValueHandling = NullValueHandling.Ignore)]
         public string WorkspaceId { get; set; }
-        [fsProperty("api_key")]
+        [JsonProperty("api_key", NullValueHandling = NullValueHandling.Ignore)]
         [Obsolete("Authentication using legacy apikey is deprecated. Please authenticate using TokenOptions.")]
         public string ApiKey { get; set; }
-        [fsProperty("apikey")]
+        [JsonProperty("apikey", NullValueHandling = NullValueHandling.Ignore)]
         public string IamApikey { get; set; }
-        [fsProperty("iam_url")]
+        [JsonProperty("iam_url", NullValueHandling = NullValueHandling.Ignore)]
         public string IamUrl { get; set; }
-        [fsProperty("assistant_id")]
+        [JsonProperty("assistant_id", NullValueHandling = NullValueHandling.Ignore)]
         public string AssistantId { get; set; }
     }
 
     /// <summary>
     /// IAM token options.
     /// </summary>
-    [fsObject]
     public class TokenOptions
     {
         private string iamApiKey;
-        [fsProperty("iamApiKey")]
+        [JsonProperty("iamApiKey", NullValueHandling = NullValueHandling.Ignore)]
         public string IamApiKey
         {
             get
@@ -644,27 +619,26 @@ namespace IBM.Cloud.SDK
                 }
             }
         }
-        [fsProperty("iamAcessToken")]
+        [JsonProperty("iamAcessToken", NullValueHandling = NullValueHandling.Ignore)]
         public string IamAccessToken { get; set; }
-        [fsProperty("iamUrl")]
+        [JsonProperty("iamUrl", NullValueHandling = NullValueHandling.Ignore)]
         public string IamUrl { get; set; }
     }
 
     /// <summary>
     /// IAM Token data.
     /// </summary>
-    [fsObject]
     public class IamTokenData
     {
-        [fsProperty("access_token")]
+        [JsonProperty("access_token", NullValueHandling = NullValueHandling.Ignore)]
         public string AccessToken { get; set; }
-        [fsProperty("refresh_token")]
+        [JsonProperty("refresh_token", NullValueHandling = NullValueHandling.Ignore)]
         public string RefreshToken { get; set; }
-        [fsProperty("token_type")]
+        [JsonProperty("token_type", NullValueHandling = NullValueHandling.Ignore)]
         public string TokenType { get; set; }
-        [fsProperty("expires_in")]
+        [JsonProperty("expires_in", NullValueHandling = NullValueHandling.Ignore)]
         public long? ExpiresIn { get; set; }
-        [fsProperty("expiration")]
+        [JsonProperty("expiration", NullValueHandling = NullValueHandling.Ignore)]
         public long? Expiration { get; set; }
     }
 }

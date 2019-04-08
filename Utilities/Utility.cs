@@ -16,7 +16,6 @@
 */
 
 
-using FullSerializer;
 using IBM.Cloud.SDK.Logging;
 using System;
 using System.Collections.Generic;
@@ -30,6 +29,7 @@ using IBM.Cloud.SDK.Connection;
 using System.Collections;
 using UnityEngine.Networking;
 using System.IO;
+using Newtonsoft.Json;
 #if NETFX_CORE
 using System.Reflection;
 #endif
@@ -41,7 +41,6 @@ namespace IBM.Cloud.SDK.Utilities
     /// </summary>
     static public class Utility
     {
-        private static fsSerializer _serializer = new fsSerializer();
         private static string _macAddress = null;
 
         /// <summary>
@@ -424,28 +423,18 @@ namespace IBM.Cloud.SDK.Utilities
         /// <typeparam name="T">The 1st type parameter.</typeparam>
         public static T DeserializeResponse<T>(string json, object obj = null) where T : class, new()
         {
+            T response = new T();
+
             try
             {
-                fsData data = null;
-                fsResult r = fsJsonParser.Parse(json, out data);
-                if (!r.Succeeded)
-                    throw new IBMException(r.FormattedMessages);
-
-                if (obj == null)
-                    obj = new T();
-
-                r = _serializer.TryDeserialize(data, obj.GetType(), ref obj);
-                if (!r.Succeeded)
-                    throw new IBMException(r.FormattedMessages);
-
-                return (T)obj;
+                response = JsonConvert.DeserializeObject<T>(json);
             }
             catch (Exception e)
             {
-                Log.Error("Utility.DeserializeResponse()", "DeserializeResponse Exception: {0}", e.ToString());
+                Log.Error("Utility.DeserializeResponse()", "Exception: {0}", e.ToString());
             }
 
-            return null;
+            return response;
         }
 
         /// <summary>
