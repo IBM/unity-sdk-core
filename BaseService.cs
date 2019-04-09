@@ -40,7 +40,7 @@ namespace IBM.Cloud.SDK
                     }
                 }
 
-                string ApiKey = Environment.GetEnvironmentVariable(serviceId.ToUpper() + "_APIKEY");
+                string ApiKey = Environment.GetEnvironmentVariable(serviceId.ToUpper() + "_IAM_APIKEY");
                 string Username = Environment.GetEnvironmentVariable(serviceId.ToUpper() + "_USERNAME");
                 string Password = Environment.GetEnvironmentVariable(serviceId.ToUpper() + "_PASSWORD");
                 string ServiceUrl = Environment.GetEnvironmentVariable(serviceId.ToUpper() + "_URL");
