@@ -16,7 +16,6 @@
 */
 
 using IBM.Cloud.SDK.Connection;
-using System.Collections.Generic;
 
 namespace IBM.Cloud.SDK
 {
