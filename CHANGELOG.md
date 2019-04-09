@@ -1,3 +1,11 @@
+## [0.1.1](https://github.com/IBM/unity-sdk-core/compare/v0.1.0...v0.1.1) (2019-04-09)
+
+
+### Bug Fixes
+
+* **Error message parsing:** Added `errorMessage` to error message parsing for errors from the IAM se ([df91bb6](https://github.com/IBM/unity-sdk-core/commit/df91bb6))
+* Look for iam_apikey in credential file for IAM auth ([d5f31d1](https://github.com/IBM/unity-sdk-core/commit/d5f31d1))
+
 ## [0.1.1](https://github.com/IBM/unity-sdk-core/compare/v0.1.0...v0.1.1) (2019-04-08)
 
 
