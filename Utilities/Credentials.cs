@@ -215,7 +215,7 @@ namespace IBM.Cloud.SDK
             {
                 if (!string.IsNullOrEmpty(serviceUrl))
                     Url = serviceUrl;
-                _iamUrl = !string.IsNullOrEmpty(iamTokenOptions.IamUrl) ? iamTokenOptions.IamUrl : "https://iam.bluemix.net/identity/token";
+                _iamUrl = !string.IsNullOrEmpty(iamTokenOptions.IamUrl) ? iamTokenOptions.IamUrl : "https://iam.cloud.ibm.com/identity/token";
                 _iamTokenData = new IamTokenData();
 
                 if (!string.IsNullOrEmpty(iamTokenOptions.IamApiKey))
