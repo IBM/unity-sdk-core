@@ -51,7 +51,7 @@ namespace IBM.Cloud.SDK
             /// <summary>
             /// URL for IBM Cloud onboarding
             /// </summary>
-            public const string IBM_CLOUD_URL = "http://console.bluemix.net/registration";
+            public const string IBM_CLOUD_URL = "http://cloud.ibm.com/registration";
             /// <summary>
             /// The version of the Unity SDK Core
             /// </summary>
