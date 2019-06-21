@@ -303,12 +303,17 @@ namespace IBM.Cloud.SDK.Connection
             WSConnector connector = new WSConnector();
             if (credentials.HasCredentials())
             {
-                connector.Authentication = credentials;
+                    connector.Authentication = credentials;
             }
-            else if (credentials.HasIamTokenData())
+            else if (credentials.iamTokenManager.HasTokenData())
             {
-                credentials.GetToken();
-                connector.Headers.Add(AUTHENTICATION_AUTHORIZATION_HEADER, string.Format("Bearer {0}", credentials.IamAccessToken));
+                credentials.iamTokenManager.GetToken();
+                connector.Headers.Add(AUTHENTICATION_AUTHORIZATION_HEADER, string.Format("Bearer {0}", credentials.iamTokenManager.GetAccessToken()));
+            }
+            else if (credentials.icp4dTokenManager.HasTokenData())
+            {
+                credentials.icp4dTokenManager.GetToken();
+                connector.Headers.Add(AUTHENTICATION_AUTHORIZATION_HEADER, string.Format("Bearer {0}", credentials.icp4dTokenManager.GetAccessToken()));
             }
 
             connector.URL = FixupURL(credentials.Url) + function + args;
