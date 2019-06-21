@@ -72,6 +72,8 @@ namespace IBM.Cloud.SDK.Authentication
 
             if (string.IsNullOrEmpty(options.IamClientSecret) || string.IsNullOrEmpty(options.IamClientId))
             {
+                iamClientId = "bx";
+                iamClientSecret = "bx";
                 Log.Warning("IamTokenManager():", CLIENT_ID_SECRET_WARNING);
             }
         }
@@ -107,7 +109,7 @@ namespace IBM.Cloud.SDK.Authentication
             req.Callback = callback;
             req.HttpMethod = UnityWebRequest.kHttpVerbGET;
             req.Headers.Add("Content-type", "application/x-www-form-urlencoded");
-            req.Headers.Add("Authorization", "Basic Yng6Yng=");
+            req.Headers.Add("Authorization", Utility.CreateAuthorization(iamClientId, iamClientSecret));
             req.OnResponse = OnRequestIamTokenResponse;
             req.DisableSslVerification = DisableSslVerification;
             req.Forms = new Dictionary<string, RESTConnector.Form>();

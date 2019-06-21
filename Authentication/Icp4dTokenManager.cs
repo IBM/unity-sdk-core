@@ -58,16 +58,6 @@ namespace IBM.Cloud.SDK.Authentication
             }
         }
 
-        /// <summary>
-        /// Create basic authentication header data for REST requests.
-        /// </summary>
-        /// <returns>The authentication data base64 encoded.</returns>
-        public string CreateAuthorization()
-        {
-            return "Basic " + Convert.ToBase64String(Encoding.ASCII.GetBytes(username + ":" + password));
-        }
-
-
         override protected bool RequestToken(Callback<TokenData> callback)
         {
             if (callback == null)
@@ -82,7 +72,7 @@ namespace IBM.Cloud.SDK.Authentication
             req.Callback = callback;
             req.HttpMethod = UnityWebRequest.kHttpVerbGET;
             req.Headers.Add("Content-type", "application/x-www-form-urlencoded");
-            req.Headers.Add("Authorization",  CreateAuthorization());
+            req.Headers.Add("Authorization",  Utility.CreateAuthorization(username, password));
             req.OnResponse = OnRequestIcp4dTokenResponse;
             req.DisableSslVerification = DisableSslVerification;
             req.Forms = new Dictionary<string, RESTConnector.Form>();

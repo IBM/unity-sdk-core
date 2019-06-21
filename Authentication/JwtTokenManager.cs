@@ -239,9 +239,8 @@ namespace IBM.Cloud.SDK.Authentication
 
     public class TokenData
     {
-        [JsonProperty("accessToken", NullValueHandling = NullValueHandling.Ignore)]
         public string AccessToken { get; set; }
-        [JsonProperty("icp4d_access_token", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("accessToken", NullValueHandling = NullValueHandling.Ignore)]
         private string icp4dAccessToken { set { AccessToken = value; } }
         [JsonProperty("access_token", NullValueHandling = NullValueHandling.Ignore)]
         private string iamAccessToken { set { AccessToken = value; } }
