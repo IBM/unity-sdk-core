@@ -269,11 +269,12 @@ namespace IBM.Cloud.SDK.Connection
                 URL = credentials.Url + function,
                 Authentication = credentials
             };
-            if (connector.Authentication.iamTokenManager.HasTokenData())
+
+            if (connector.Authentication.HasIamTokenData())
             {
                 connector.Authentication.iamTokenManager.GetToken();
             }
-            else if (connector.Authentication.icp4dTokenManager.HasTokenData())
+            else if (connector.Authentication.HasIcp4dTokenData())
             {
                 connector.Authentication.icp4dTokenManager.GetToken();
             }
@@ -329,11 +330,11 @@ namespace IBM.Cloud.SDK.Connection
                 {
                     headers.Add(AUTHENTICATION_AUTHORIZATION_HEADER, Authentication.CreateAuthorization());
                 }
-                else if (Authentication.iamTokenManager.HasTokenData())
+                else if (Authentication.HasIamTokenData())
                 {
                     headers.Add(AUTHENTICATION_AUTHORIZATION_HEADER, string.Format("Bearer {0}", Authentication.iamTokenManager.GetAccessToken()));
                 }
-                else if (Authentication.icp4dTokenManager.HasTokenData())
+                else if (Authentication.HasIcp4dTokenData())
                 {
                    headers.Add(AUTHENTICATION_AUTHORIZATION_HEADER, string.Format("Bearer {0}", Authentication.icp4dTokenManager.GetAccessToken()));
                 }

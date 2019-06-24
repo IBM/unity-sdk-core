@@ -84,8 +84,7 @@ namespace IBM.Cloud.SDK
                         credentials.Url = url;
                     }
                 }
-
-                if (!string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password))
+                else if (!string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password))
                 {
                     credentials = new Credentials(Username, Password, url);
                 }

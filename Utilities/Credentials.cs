@@ -165,7 +165,7 @@ namespace IBM.Cloud.SDK
         {
             if (!string.IsNullOrEmpty(serviceUrl))
                 Url = serviceUrl;
-            SetCredentials(icp4dTokenOptions);
+            SetCredentials(icp4dTokenOptions, serviceUrl);
         }
         #endregion
 
@@ -222,7 +222,7 @@ namespace IBM.Cloud.SDK
             }
         }
 
-        private void SetCredentials(Icp4dTokenOptions icp4dTokenOptions)
+        private void SetCredentials(Icp4dTokenOptions icp4dTokenOptions, string serviceUrl = null)
         {
             icp4dTokenManager = new Icp4dTokenManager(icp4dTokenOptions);
             icp4dTokenManager.GetToken();
@@ -248,12 +248,44 @@ namespace IBM.Cloud.SDK
         }
 
         /// <summary>
-        /// Do we have credentials?
+        /// Do we have Token Data?
+        /// </summary>
+        /// <returns>true if the class has a username and password.</returns>
+        public bool HasTokenData()
+        {
+            return HasIamTokenData() || HasIcp4dTokenData();
+        }
+
+        /// <summary>
+        /// Do we have IAM token data?
         /// </summary>
         /// <returns>true if the class has a username and password.</returns>
         public bool HasIamTokenData()
         {
-            return iamTokenManager.HasTokenData();
+            if (iamTokenManager != null)
+            {
+                return iamTokenManager.HasTokenData();
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Do we have ICP4D token data?
+        /// </summary>
+        /// <returns>true if the class has a username and password.</returns>
+        public bool HasIcp4dTokenData()
+        {
+            if (icp4dTokenManager != null)
+            {
+                return icp4dTokenManager.HasTokenData();
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 

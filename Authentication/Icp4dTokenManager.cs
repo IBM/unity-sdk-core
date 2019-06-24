@@ -37,9 +37,9 @@ namespace IBM.Cloud.SDK.Authentication
         {
             tokenName = "accessToken";
 
-            if (!string.IsNullOrEmpty(url))
+            if (!string.IsNullOrEmpty(options.Url))
             {
-                url = url + "/v1/preauth/validateAuth";
+                url = options.Url + "/v1/preauth/validateAuth";
             }
             else if (string.IsNullOrEmpty(userAccessToken))
             {
@@ -56,6 +56,11 @@ namespace IBM.Cloud.SDK.Authentication
             {
                 password = options.Password;
             }
+            if (!string.IsNullOrEmpty(options.AccessToken))
+            {
+                userAccessToken = options.AccessToken;
+            }
+            disableSslVerification = options.DisableSslVerification;
         }
 
         override protected bool RequestToken(Callback<TokenData> callback)
@@ -69,14 +74,12 @@ namespace IBM.Cloud.SDK.Authentication
                 return false;
 
             RequestIcp4dTokenRequest req = new RequestIcp4dTokenRequest();
-            req.Callback = callback;
             req.HttpMethod = UnityWebRequest.kHttpVerbGET;
+            req.Callback = callback;
             req.Headers.Add("Content-type", "application/x-www-form-urlencoded");
-            req.Headers.Add("Authorization",  Utility.CreateAuthorization(username, password));
+            req.Headers.Add("Authorization", Utility.CreateAuthorization(username, password));
             req.OnResponse = OnRequestIcp4dTokenResponse;
-            req.DisableSslVerification = DisableSslVerification;
-            req.Forms = new Dictionary<string, RESTConnector.Form>();
-
+            req.DisableSslVerification = disableSslVerification;
             return connector.Send(req);
         }
 
@@ -147,6 +150,6 @@ namespace IBM.Cloud.SDK.Authentication
             }
         }
 
-        public bool disableSslVerification { get; set; }
+        public bool DisableSslVerification { get; set; }
     }
 }

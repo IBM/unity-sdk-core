@@ -31,7 +31,7 @@ namespace IBM.Cloud.SDK.Authentication
         protected string url;
         protected string tokenName;
         protected string userAccessToken;
-        protected bool DisableSslVerification;  // for icp4d only
+        protected bool disableSslVerification;  // for icp4d only
         public TokenData tokenData;
         private long? expireTime;
 
@@ -71,7 +71,7 @@ namespace IBM.Cloud.SDK.Authentication
             if (!string.IsNullOrEmpty(userAccessToken))
             {
                 // 1. use user-managed token
-                OnGetToken(new DetailedResponse<TokenData>() { Result = new TokenData() { AccessToken = userAccessToken } }, new IBMError());
+                tokenData.AccessToken = userAccessToken;
             }
             else if (string.IsNullOrEmpty(tokenData.AccessToken) || IsTokenExpired())
             {
@@ -99,13 +99,22 @@ namespace IBM.Cloud.SDK.Authentication
         /// <returns></returns>
         public bool HasTokenData()
         {
-          return tokenData.AccessToken != null;
+            return tokenData.AccessToken != null;
         }
 
         private void OnGetToken(DetailedResponse<TokenData> response, IBMError error)
         {
             SaveTokenInfo(response.Result);
         }
+        #endregion
+
+        #region Callback delegates
+        /// <summary>
+        /// Success callback delegate.
+        /// </summary>
+        /// <typeparam name="T">Type of the returned object.</typeparam>
+        /// <param name="response">The returned DetailedResponse.</param>
+        public delegate void Callback<T>(DetailedResponse<T> response, IBMError error);
         #endregion
 
         /// <summary>
@@ -190,9 +199,9 @@ namespace IBM.Cloud.SDK.Authentication
 
                 if (!string.IsNullOrEmpty(decodedResponse))
                 {
-                    var o = JObject.Parse(decodedResponse);
-                    long exp = (long)o["exp"];
-                    long iat = (long)o["iat"];
+                    var token = JObject.Parse(decodedResponse);
+                    long exp = (long)token["exp"];
+                    long iat = (long)token["iat"];
 
                     double fractonOfTtl = 0.8d;
                     long timeToLive = exp - iat;

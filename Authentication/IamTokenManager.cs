@@ -38,6 +38,7 @@ namespace IBM.Cloud.SDK.Authentication
 
         public IamTokenManager(IamTokenOptions options) : base(options)
         {
+			tokenName = "access_token";
             if (string.IsNullOrEmpty(url))
             {
                 if (!string.IsNullOrEmpty(options.IamUrl))
@@ -111,7 +112,7 @@ namespace IBM.Cloud.SDK.Authentication
             req.Headers.Add("Content-type", "application/x-www-form-urlencoded");
             req.Headers.Add("Authorization", Utility.CreateAuthorization(iamClientId, iamClientSecret));
             req.OnResponse = OnRequestIamTokenResponse;
-            req.DisableSslVerification = DisableSslVerification;
+            req.DisableSslVerification = disableSslVerification;
             req.Forms = new Dictionary<string, RESTConnector.Form>();
             req.Forms["grant_type"] = new RESTConnector.Form("urn:ibm:params:oauth:grant-type:apikey");
             req.Forms["apikey"] = new RESTConnector.Form(iamApikey);

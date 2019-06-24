@@ -305,12 +305,12 @@ namespace IBM.Cloud.SDK.Connection
             {
                     connector.Authentication = credentials;
             }
-            else if (credentials.iamTokenManager.HasTokenData())
+            else if (credentials.HasIamTokenData())
             {
                 credentials.iamTokenManager.GetToken();
                 connector.Headers.Add(AUTHENTICATION_AUTHORIZATION_HEADER, string.Format("Bearer {0}", credentials.iamTokenManager.GetAccessToken()));
             }
-            else if (credentials.icp4dTokenManager.HasTokenData())
+            else if (credentials.HasIcp4dTokenData())
             {
                 credentials.icp4dTokenManager.GetToken();
                 connector.Headers.Add(AUTHENTICATION_AUTHORIZATION_HEADER, string.Format("Bearer {0}", credentials.icp4dTokenManager.GetAccessToken()));
