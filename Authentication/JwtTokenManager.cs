@@ -44,7 +44,6 @@ namespace IBM.Cloud.SDK.Authentication
         public JwtTokenManager(JwtTokenOptions options)
         {
             tokenData = new TokenData();
-            tokenName = "access_token";
 
             if (!string.IsNullOrEmpty(options.Url))
             {

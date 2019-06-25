@@ -35,7 +35,6 @@ namespace IBM.Cloud.SDK.Authentication
 
         public Icp4dTokenManager(Icp4dTokenOptions options) : base(options)
         {
-            tokenName = "accessToken";
 
             if (!string.IsNullOrEmpty(options.Url))
             {

@@ -303,7 +303,7 @@ namespace IBM.Cloud.SDK.Connection
             WSConnector connector = new WSConnector();
             if (credentials.HasCredentials())
             {
-                    connector.Authentication = credentials;
+                connector.Authentication = credentials;
             }
             else if (credentials.HasIamTokenData())
             {

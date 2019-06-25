@@ -38,7 +38,6 @@ namespace IBM.Cloud.SDK.Authentication
 
         public IamTokenManager(IamTokenOptions options) : base(options)
         {
-			tokenName = "access_token";
             if (string.IsNullOrEmpty(url))
             {
                 if (!string.IsNullOrEmpty(options.IamUrl))
@@ -157,7 +156,6 @@ namespace IBM.Cloud.SDK.Authentication
     public class IamTokenOptions : JwtTokenOptions
     {
         private string iamApiKey;
-        [JsonProperty("iamApiKey", NullValueHandling = NullValueHandling.Ignore)]
         public string IamApiKey
         {
             get
@@ -176,9 +174,7 @@ namespace IBM.Cloud.SDK.Authentication
                 }
             }
         }
-        [JsonProperty("iamAcessToken", NullValueHandling = NullValueHandling.Ignore)]
         public string IamAccessToken { get; set; }
-        [JsonProperty("iamUrl", NullValueHandling = NullValueHandling.Ignore)]
         public string IamUrl { get; set; }
         public string IamClientId { get; set; }
         public string IamClientSecret { get; set; }
