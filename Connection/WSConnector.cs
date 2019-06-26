@@ -307,8 +307,13 @@ namespace IBM.Cloud.SDK.Connection
             }
             else if (credentials.HasIamTokenData())
             {
-                credentials.GetToken();
-                connector.Headers.Add(AUTHENTICATION_AUTHORIZATION_HEADER, string.Format("Bearer {0}", credentials.IamAccessToken));
+                credentials.iamTokenManager.GetToken();
+                connector.Headers.Add(AUTHENTICATION_AUTHORIZATION_HEADER, string.Format("Bearer {0}", credentials.iamTokenManager.GetAccessToken()));
+            }
+            else if (credentials.HasIcp4dTokenData())
+            {
+                credentials.icp4dTokenManager.GetToken();
+                connector.Headers.Add(AUTHENTICATION_AUTHORIZATION_HEADER, string.Format("Bearer {0}", credentials.icp4dTokenManager.GetAccessToken()));
             }
 
             connector.URL = FixupURL(credentials.Url) + function + args;

@@ -93,7 +93,6 @@ namespace IBM.Cloud.SDK.Connection
             public Dictionary<string, string> Headers { get; set; }
             #endregion
         };
-
         /// <summary>
         /// Multi-part form data class.
         /// </summary>
@@ -260,7 +259,7 @@ namespace IBM.Cloud.SDK.Connection
         /// <param name="serviceID">The ID of the service.</param>
         /// <param name="function">The name of the function.</param>
         /// <returns>Returns a RESTConnector object or null on error.</returns>
-        /// 
+        ///
 
 
         public static RESTConnector GetConnector(Credentials credentials, string function)
@@ -270,11 +269,15 @@ namespace IBM.Cloud.SDK.Connection
                 URL = credentials.Url + function,
                 Authentication = credentials
             };
+
             if (connector.Authentication.HasIamTokenData())
             {
-                connector.Authentication.GetToken();
+                connector.Authentication.iamTokenManager.GetToken();
             }
-
+            else if (connector.Authentication.HasIcp4dTokenData())
+            {
+                connector.Authentication.icp4dTokenManager.GetToken();
+            }
             return connector;
         }
 
@@ -329,7 +332,11 @@ namespace IBM.Cloud.SDK.Connection
                 }
                 else if (Authentication.HasIamTokenData())
                 {
-                    headers.Add(AUTHENTICATION_AUTHORIZATION_HEADER, string.Format("Bearer {0}", Authentication.IamAccessToken));
+                    headers.Add(AUTHENTICATION_AUTHORIZATION_HEADER, string.Format("Bearer {0}", Authentication.iamTokenManager.GetAccessToken()));
+                }
+                else if (Authentication.HasIcp4dTokenData())
+                {
+                   headers.Add(AUTHENTICATION_AUTHORIZATION_HEADER, string.Format("Bearer {0}", Authentication.icp4dTokenManager.GetAccessToken()));
                 }
             }
 
@@ -581,7 +588,6 @@ namespace IBM.Cloud.SDK.Connection
                         Response = unityWebRequest.downloadHandler.text,
                         ResponseHeaders = unityWebRequest.GetResponseHeaders()
                     };
-
                     if (bError)
                     {
                         Log.Error("RESTConnector.ProcessRequestQueue()", "URL: {0}, ErrorCode: {1}, Error: {2}, Response: {3}", url, unityWebRequest.responseCode, unityWebRequest.error,

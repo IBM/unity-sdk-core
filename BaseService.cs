@@ -16,6 +16,7 @@
 */
 
 using IBM.Cloud.SDK.Utilities;
+using IBM.Cloud.SDK.Authentication;
 using System;
 using System.Collections.Generic;
 
@@ -48,17 +49,32 @@ namespace IBM.Cloud.SDK
                 string Username = Environment.GetEnvironmentVariable(serviceId.ToUpper() + "_USERNAME");
                 string Password = Environment.GetEnvironmentVariable(serviceId.ToUpper() + "_PASSWORD");
                 string ServiceUrl = Environment.GetEnvironmentVariable(serviceId.ToUpper() + "_URL");
+                string AuthenticationType = Environment.GetEnvironmentVariable(serviceId.ToUpper() + "_AUTHENTICATION_TYPE");
+                string Icp4dAccessToken = Environment.GetEnvironmentVariable(serviceId.ToUpper() + "_ICP4D_ACCESS_TOKEN");
+                string Icp4dUrl = Environment.GetEnvironmentVariable(serviceId.ToUpper() + "_ICP4D_URL");
 
                 if (string.IsNullOrEmpty(ApiKey) && (string.IsNullOrEmpty(Username) || string.IsNullOrEmpty(Password)))
                 {
                     throw new NullReferenceException(string.Format("Either {0}_APIKEY or {0}_USERNAME and {0}_PASSWORD did not exist. Please add credentials with this key in ibm-credentials.env.", serviceId.ToUpper()));
                 }
 
-                if (!string.IsNullOrEmpty(ApiKey))
+                if (!string.IsNullOrEmpty(ApiKey) || AuthenticationType == "iam")
                 {
-                    TokenOptions tokenOptions = new TokenOptions()
+                    IamTokenOptions tokenOptions = new IamTokenOptions()
                     {
                         IamApiKey = ApiKey
+                    };
+                    credentials = new Credentials(tokenOptions, ServiceUrl);
+                }
+
+                if (!string.IsNullOrEmpty(Icp4dAccessToken) || AuthenticationType == "icp4d")
+                {
+                    Icp4dTokenOptions tokenOptions = new Icp4dTokenOptions()
+                    {
+                        Username = Username,
+                        Password = Password,
+                        AccessToken = Icp4dAccessToken,
+                        Url = Icp4dUrl
                     };
 
                     credentials = new Credentials(tokenOptions, ServiceUrl);
@@ -68,8 +84,7 @@ namespace IBM.Cloud.SDK
                         credentials.Url = url;
                     }
                 }
-
-                if (!string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password))
+                else if (!string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password))
                 {
                     credentials = new Credentials(Username, Password, url);
                 }

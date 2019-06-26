@@ -15,13 +15,12 @@
 *
 */
 
-using IBM.Cloud.SDK.Connection;
 using IBM.Cloud.SDK.Utilities;
+using IBM.Cloud.SDK.Authentication;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using UnityEngine.Networking;
 using Utility = IBM.Cloud.SDK.Utilities.Utility;
 
 namespace IBM.Cloud.SDK
@@ -31,11 +30,10 @@ namespace IBM.Cloud.SDK
     /// </summary>
     public class Credentials
     {
+        public IamTokenManager iamTokenManager;
+        public Icp4dTokenManager icp4dTokenManager;
+
         #region Private Data
-        private string _iamUrl;
-        private IamTokenData _iamTokenData;
-        private string _iamApiKey;
-        private string _userAcessToken;
         private string url;
         private string username;
         private string password;
@@ -80,6 +78,7 @@ namespace IBM.Cloud.SDK
                 }
             }
         }
+
         /// <summary>
         /// The Api Key.
         /// </summary>
@@ -102,43 +101,6 @@ namespace IBM.Cloud.SDK
                 }
             }
         }
-
-        /// <summary>
-        /// The IAM access token.
-        /// </summary>
-        public string IamAccessToken { get; set; }
-
-        /// <summary>
-        /// IAM token data.
-        /// </summary>
-        public IamTokenData TokenData
-        {
-            set
-            {
-                _tokenData = value;
-                if (!string.IsNullOrEmpty(_tokenData.AccessToken))
-                    IamAccessToken = _tokenData.AccessToken;
-            }
-        }
-        private IamTokenData _tokenData = null;
-        private bool disableSslVerification = false;
-        /// <summary>
-        /// Gets and sets the option to disable ssl verification for getting an IAM token.
-        /// </summary>
-        public bool DisableSslVerification
-        {
-            get { return disableSslVerification; }
-            set { disableSslVerification = value; }
-        }
-        #endregion
-
-        #region Callback delegates
-        /// <summary>
-        /// Success callback delegate.
-        /// </summary>
-        /// <typeparam name="T">Type of the returned object.</typeparam>
-        /// <param name="response">The returned DetailedResponse.</param>
-        public delegate void Callback<T>(DetailedResponse<T> response, IBMError error);
         #endregion
 
         #region Constructors
@@ -177,9 +139,33 @@ namespace IBM.Cloud.SDK
         /// Constructor that takes IAM token options.
         /// </summary>
         /// <param name="iamTokenOptions"></param>
-        public Credentials(TokenOptions iamTokenOptions, string serviceUrl = null)
+        public Credentials(IamTokenOptions iamTokenOptions, string serviceUrl = null)
         {
+            if (!string.IsNullOrEmpty(serviceUrl))
+                Url = serviceUrl;
             SetCredentials(iamTokenOptions, serviceUrl);
+        }
+
+        /// <summary>
+        /// Constructor that takes IAM token options.
+        /// </summary>
+        /// <param name="TokenOptions"></param>
+        public Credentials(TokenOptions tokenOptions, string serviceUrl = null)
+        {
+            if (!string.IsNullOrEmpty(serviceUrl))
+                Url = serviceUrl;
+            SetCredentials(tokenOptions, serviceUrl);
+        }
+
+        /// <summary>
+        /// Constructor that takes ICP4D token options.
+        /// </summary>
+        /// <param name="icp4dTokenOptions"></param>
+        public Credentials(Icp4dTokenOptions icp4dTokenOptions, string serviceUrl = null)
+        {
+            if (!string.IsNullOrEmpty(serviceUrl))
+                Url = serviceUrl;
+            SetCredentials(icp4dTokenOptions, serviceUrl);
         }
         #endregion
 
@@ -188,7 +174,7 @@ namespace IBM.Cloud.SDK
         {
             if (username == APIKEY_AS_USERNAME && !password.StartsWith(ICP_PREFIX))
             {
-                TokenOptions tokenOptions = new TokenOptions()
+                IamTokenOptions tokenOptions = new IamTokenOptions()
                 {
                     IamApiKey = password
                 };
@@ -205,7 +191,7 @@ namespace IBM.Cloud.SDK
                 Url = url;
         }
 
-        private void SetCredentials(TokenOptions iamTokenOptions, string serviceUrl = null)
+        private void SetCredentials(IamTokenOptions iamTokenOptions, string serviceUrl = null)
         {
             if (iamTokenOptions.IamApiKey.StartsWith(ICP_PREFIX))
             {
@@ -213,258 +199,33 @@ namespace IBM.Cloud.SDK
             }
             else
             {
-                if (!string.IsNullOrEmpty(serviceUrl))
-                    Url = serviceUrl;
-                _iamUrl = !string.IsNullOrEmpty(iamTokenOptions.IamUrl) ? iamTokenOptions.IamUrl : "https://iam.cloud.ibm.com/identity/token";
-                _iamTokenData = new IamTokenData();
-
-                if (!string.IsNullOrEmpty(iamTokenOptions.IamApiKey))
-                    _iamApiKey = iamTokenOptions.IamApiKey;
-
-                if (!string.IsNullOrEmpty(iamTokenOptions.IamAccessToken))
-                    this._userAcessToken = iamTokenOptions.IamAccessToken;
-
-                GetToken();
+                iamTokenManager = new IamTokenManager(iamTokenOptions);
+                iamTokenManager.GetToken();
             }
         }
-        #endregion
 
-        #region Get Token
-        /// <summary>
-        /// This function sends an access token back through a callback. The source of the token
-        /// is determined by the following logic:
-        /// 1. If user provides their own managed access token, assume it is valid and send it
-        /// 2. If this class is managing tokens and does not yet have one, make a request for one
-        /// 3. If this class is managing tokens and the token has expired, refresh it
-        /// 4. If this class is managing tokens and has a valid token stored, send it
-        /// </summary>
-        public void GetToken()
+        private void SetCredentials(TokenOptions tokenOptions, string serviceUrl = null)
         {
-            if (!string.IsNullOrEmpty(_userAcessToken))
+            if (tokenOptions.IamApiKey.StartsWith(ICP_PREFIX))
             {
-                // 1. use user-managed token
-                OnGetToken(new DetailedResponse<IamTokenData>() { Result = new IamTokenData() { AccessToken = _userAcessToken } }, new IBMError());
-            }
-            else if (!string.IsNullOrEmpty(_iamTokenData.AccessToken) || IsRefreshTokenExpired())
-            {
-                // 2. request an initial token
-                RequestIamToken(OnGetToken);
-            }
-            else if (IsTokenExpired())
-            {
-                // 3. refresh a token
-                RefreshIamToken(OnGetToken);
+                SetCredentials(APIKEY_AS_USERNAME, tokenOptions.IamApiKey, serviceUrl);
             }
             else
             {
-                //  4. use valid managed token
-
-                OnGetToken(new DetailedResponse<IamTokenData>() { Result = new IamTokenData() { AccessToken = _iamTokenData.AccessToken } }, new IBMError());
+                string iamApiKey = tokenOptions.IamApiKey;
+                IamTokenOptions iamTokenOptions = new IamTokenOptions()
+                {
+                    IamApiKey = iamApiKey
+                };
+                iamTokenManager = new IamTokenManager(iamTokenOptions);
+                iamTokenManager.GetToken();
             }
         }
 
-        private void OnGetToken(DetailedResponse<IamTokenData> response, IBMError error)
+        private void SetCredentials(Icp4dTokenOptions icp4dTokenOptions, string serviceUrl = null)
         {
-            SaveTokenInfo(response.Result);
-        }
-
-        #endregion
-
-        #region Request Token
-        /// <summary>
-        /// Request an IAM token using an API key.
-        /// </summary>
-        /// <param name="callback">The request callback.</param>
-        /// <param name="error"> The request error.</param>
-        /// <returns></returns>
-        public bool RequestIamToken(Callback<IamTokenData> callback)
-        {
-            if (callback == null)
-                throw new ArgumentNullException("successCallback");
-
-            RESTConnector connector = new RESTConnector();
-            connector.URL = _iamUrl;
-            if (connector == null)
-                return false;
-
-            RequestIamTokenRequest req = new RequestIamTokenRequest();
-            req.Callback = callback;
-            req.HttpMethod = UnityWebRequest.kHttpVerbGET;
-            req.Headers.Add("Content-type", "application/x-www-form-urlencoded");
-            req.Headers.Add("Authorization", "Basic Yng6Yng=");
-            req.OnResponse = OnRequestIamTokenResponse;
-            req.DisableSslVerification = DisableSslVerification;
-            req.Forms = new Dictionary<string, RESTConnector.Form>();
-            req.Forms["grant_type"] = new RESTConnector.Form("urn:ibm:params:oauth:grant-type:apikey");
-            req.Forms["apikey"] = new RESTConnector.Form(_iamApiKey);
-            req.Forms["response_type"] = new RESTConnector.Form("cloud_iam");
-
-            return connector.Send(req);
-        }
-
-        private class RequestIamTokenRequest : RESTConnector.Request
-        {
-            public Callback<IamTokenData> Callback { get; set; }
-        }
-
-        private void OnRequestIamTokenResponse(RESTConnector.Request req, RESTConnector.Response resp)
-        {
-            DetailedResponse<IamTokenData> response = new DetailedResponse<IamTokenData>();
-            response.Result = new IamTokenData();
-            foreach (KeyValuePair<string, string> kvp in resp.Headers)
-            {
-                response.Headers.Add(kvp.Key, kvp.Value);
-            }
-            response.StatusCode = resp.HttpResponseCode;
-
-            try
-            {
-                string json = Encoding.UTF8.GetString(resp.Data);
-                response.Result = JsonConvert.DeserializeObject<IamTokenData>(json);
-                response.Response = json;
-            }
-            catch (Exception e)
-            {
-                Log.Error("Credentials.OnRequestIamTokenResponse()", "Exception: {0}", e.ToString());
-                resp.Success = false;
-            }
-
-            if (((RequestIamTokenRequest)req).Callback != null)
-                ((RequestIamTokenRequest)req).Callback(response, resp.Error);
-        }
-        #endregion
-
-        #region Refresh Token
-        /// <summary>
-        /// Refresh an IAM token using a refresh token.
-        /// </summary>
-        /// <param name="callback">The success callback.</param>
-        /// <param name="failCallback">The fail callback.</param>
-        /// <returns></returns>
-        public bool RefreshIamToken(Callback<IamTokenData> callback)
-        {
-            if (callback == null)
-                throw new ArgumentNullException("callback");
-
-            RESTConnector connector = new RESTConnector();
-            connector.URL = _iamUrl;
-            if (connector == null)
-                return false;
-
-            RefreshIamTokenRequest req = new RefreshIamTokenRequest();
-            req.Callback = callback;
-            req.HttpMethod = UnityWebRequest.kHttpVerbGET;
-            req.Headers.Add("Content-type", "application/x-www-form-urlencoded");
-            req.Headers.Add("Authorization", "Basic Yng6Yng=");
-            req.OnResponse = OnRefreshIamTokenResponse;
-            req.DisableSslVerification = DisableSslVerification;
-            req.Forms = new Dictionary<string, RESTConnector.Form>();
-            req.Forms["grant_type"] = new RESTConnector.Form("refresh_token");
-            req.Forms["refresh_token"] = new RESTConnector.Form(_iamTokenData.RefreshToken);
-
-            return connector.Send(req);
-        }
-
-        private class RefreshIamTokenRequest : RESTConnector.Request
-        {
-            public Callback<IamTokenData> Callback { get; set; }
-        }
-
-        private void OnRefreshIamTokenResponse(RESTConnector.Request req, RESTConnector.Response resp)
-        {
-            DetailedResponse<IamTokenData> response = new DetailedResponse<IamTokenData>();
-            response.Result = new IamTokenData();
-            foreach (KeyValuePair<string, string> kvp in resp.Headers)
-            {
-                response.Headers.Add(kvp.Key, kvp.Value);
-            }
-            response.StatusCode = resp.HttpResponseCode;
-
-            try
-            {
-                string json = Encoding.UTF8.GetString(resp.Data);
-                response.Result = JsonConvert.DeserializeObject<IamTokenData>(json);
-                response.Response = json;
-            }
-            catch (Exception e)
-            {
-                Log.Error("Credentials.OnRefreshIamTokenResponse()", "Exception: {0}", e.ToString());
-                resp.Success = false;
-            }
-
-            if (((RefreshIamTokenRequest)req).Callback != null)
-                ((RefreshIamTokenRequest)req).Callback(response, resp.Error);
-        }
-        #endregion
-
-        #region Token Operations
-        /// <summary>
-        /// Check if currently stored token is expired.
-        /// 
-        /// Using a buffer to prevent the edge case of the 
-        /// token expiring before the request could be made.
-        /// 
-        /// The buffer will be a fraction of the total TTL. Using 80%.
-        /// </summary>
-        /// <returns></returns>
-        public bool IsTokenExpired()
-        {
-            if (_iamTokenData.ExpiresIn == null || _iamTokenData.Expiration == null)
-                return true;
-
-            float fractionOfTtl = 0.8f;
-            long? timeToLive = _iamTokenData.ExpiresIn;
-            long? expireTime = _iamTokenData.Expiration;
-            System.DateTime epochStart = new System.DateTime(1970, 1, 1, 0, 0, 0, System.DateTimeKind.Utc);
-            long currentTime = (int)(System.DateTime.UtcNow - epochStart).TotalSeconds;
-
-            double? refreshTime = expireTime - (timeToLive * (1.0 - fractionOfTtl));
-            return refreshTime < currentTime;
-        }
-
-        /// <summary>
-        /// Used as a fail-safe to prevent the condition of a refresh token expiring,
-        /// which could happen after around 30 days.This function will return true
-        /// if it has been at least 7 days and 1 hour since the last token was
-        /// retrieved.
-        /// </summary>
-        /// <returns></returns>
-        public bool IsRefreshTokenExpired()
-        {
-            if (_iamTokenData.Expiration == null)
-            {
-                return true;
-            };
-
-            long sevenDays = 7 * 24 * 3600;
-            System.DateTime epochStart = new System.DateTime(1970, 1, 1, 0, 0, 0, System.DateTimeKind.Utc);
-            long currentTime = (int)(System.DateTime.UtcNow - epochStart).TotalSeconds;
-            long? newTokenTime = _iamTokenData.Expiration + sevenDays;
-            return newTokenTime < currentTime;
-        }
-
-        /// <summary>
-        /// Save the response from the IAM service request to the object's state.
-        /// </summary>
-        /// <param name="iamTokenData">Response object from IAM service request</param>
-        public void SaveTokenInfo(IamTokenData iamTokenData)
-        {
-            TokenData = iamTokenData;
-        }
-
-        /// <summary>
-        /// Set a self-managed IAM access token.
-        /// The access token should be valid and not yet expired.
-        /// 
-        /// By using this method, you accept responsibility for managing the
-        /// access token yourself.You must set a new access token before this
-        /// one expires. Failing to do so will result in authentication errors
-        /// after this token expires.
-        /// </summary>
-        /// <param name="iamAccessToken">A valid, non-expired IAM access token.</param>
-        public void SetAccessToken(string iamAccessToken)
-        {
-            _userAcessToken = iamAccessToken;
+            icp4dTokenManager = new Icp4dTokenManager(icp4dTokenOptions);
+            icp4dTokenManager.GetToken();
         }
         #endregion
 
@@ -487,39 +248,44 @@ namespace IBM.Cloud.SDK
         }
 
         /// <summary>
-        /// Do we have an ApiKey?
+        /// Do we have Token Data?
         /// </summary>
-        /// <returns>True if the class has a Authentication Token</returns>
-        public bool HasApiKey()
+        /// <returns>true if the class has a username and password.</returns>
+        public bool HasTokenData()
         {
-            return !string.IsNullOrEmpty(ApiKey);
+            return HasIamTokenData() || HasIcp4dTokenData();
         }
 
         /// <summary>
-        /// Do we have IamTokenData?
+        /// Do we have IAM token data?
         /// </summary>
-        /// <returns></returns>
+        /// <returns>true if the class has a username and password.</returns>
         public bool HasIamTokenData()
         {
-            return _tokenData != null;
+            if (iamTokenManager != null)
+            {
+                return iamTokenManager.HasTokenData();
+            }
+            else
+            {
+                return false;
+            }
         }
 
         /// <summary>
-        /// Do we have an IAM apikey?
+        /// Do we have ICP4D token data?
         /// </summary>
-        /// <returns></returns>
-        public bool HasIamApikey()
+        /// <returns>true if the class has a username and password.</returns>
+        public bool HasIcp4dTokenData()
         {
-            return !string.IsNullOrEmpty(_iamApiKey);
-        }
-
-        /// <summary>
-        /// Do we have an IAM authentication token?
-        /// </summary>
-        /// <returns></returns>
-        public bool HasIamAuthorizationToken()
-        {
-            return !string.IsNullOrEmpty(_userAcessToken);
+            if (icp4dTokenManager != null)
+            {
+                return icp4dTokenManager.HasTokenData();
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 
@@ -571,31 +337,7 @@ namespace IBM.Cloud.SDK
     }
 
     /// <summary>
-    /// The Credentials.
-    /// </summary>
-    public class Credential
-    {
-        [JsonProperty("url", NullValueHandling = NullValueHandling.Ignore)]
-        public string Url { get; set; }
-        [JsonProperty("username", NullValueHandling = NullValueHandling.Ignore)]
-        public string Username { get; set; }
-        [JsonProperty("password", NullValueHandling = NullValueHandling.Ignore)]
-        public string Password { get; set; }
-        [JsonProperty("workspace_id", NullValueHandling = NullValueHandling.Ignore)]
-        public string WorkspaceId { get; set; }
-        [JsonProperty("api_key", NullValueHandling = NullValueHandling.Ignore)]
-        [Obsolete("Authentication using legacy apikey is deprecated. Please authenticate using TokenOptions.")]
-        public string ApiKey { get; set; }
-        [JsonProperty("apikey", NullValueHandling = NullValueHandling.Ignore)]
-        public string IamApikey { get; set; }
-        [JsonProperty("iam_url", NullValueHandling = NullValueHandling.Ignore)]
-        public string IamUrl { get; set; }
-        [JsonProperty("assistant_id", NullValueHandling = NullValueHandling.Ignore)]
-        public string AssistantId { get; set; }
-    }
-
-    /// <summary>
-    /// IAM token options.
+    /// IAM token options. // Support legacy code
     /// </summary>
     public class TokenOptions
     {
@@ -625,20 +367,28 @@ namespace IBM.Cloud.SDK
         public string IamUrl { get; set; }
     }
 
+
     /// <summary>
-    /// IAM Token data.
+    /// The Credentials.
     /// </summary>
-    public class IamTokenData
+    public class Credential
     {
-        [JsonProperty("access_token", NullValueHandling = NullValueHandling.Ignore)]
-        public string AccessToken { get; set; }
-        [JsonProperty("refresh_token", NullValueHandling = NullValueHandling.Ignore)]
-        public string RefreshToken { get; set; }
-        [JsonProperty("token_type", NullValueHandling = NullValueHandling.Ignore)]
-        public string TokenType { get; set; }
-        [JsonProperty("expires_in", NullValueHandling = NullValueHandling.Ignore)]
-        public long? ExpiresIn { get; set; }
-        [JsonProperty("expiration", NullValueHandling = NullValueHandling.Ignore)]
-        public long? Expiration { get; set; }
+        [JsonProperty("url", NullValueHandling = NullValueHandling.Ignore)]
+        public string Url { get; set; }
+        [JsonProperty("username", NullValueHandling = NullValueHandling.Ignore)]
+        public string Username { get; set; }
+        [JsonProperty("password", NullValueHandling = NullValueHandling.Ignore)]
+        public string Password { get; set; }
+        [JsonProperty("workspace_id", NullValueHandling = NullValueHandling.Ignore)]
+        public string WorkspaceId { get; set; }
+        [JsonProperty("api_key", NullValueHandling = NullValueHandling.Ignore)]
+        [Obsolete("Authentication using legacy apikey is deprecated. Please authenticate using TokenOptions.")]
+        public string ApiKey { get; set; }
+        [JsonProperty("apikey", NullValueHandling = NullValueHandling.Ignore)]
+        public string IamApikey { get; set; }
+        [JsonProperty("iam_url", NullValueHandling = NullValueHandling.Ignore)]
+        public string IamUrl { get; set; }
+        [JsonProperty("assistant_id", NullValueHandling = NullValueHandling.Ignore)]
+        public string AssistantId { get; set; }
     }
 }
