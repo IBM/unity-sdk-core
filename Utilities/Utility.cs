@@ -1145,7 +1145,7 @@ namespace IBM.Cloud.SDK.Utilities
             throw new ArgumentException("Requested mime type is not registered: " + mimeType);
         }
         #endregion
-        
+
         #region CreateAuthorization
         /// <summary>
         /// Create basic authentication header data for REST requests.
@@ -1333,7 +1333,6 @@ namespace IBM.Cloud.SDK.Utilities
                 {
                     authorization = _token;
                 }
-                
                 if(!string.IsNullOrEmpty(authorization))
                     unityWebRequest.SetRequestHeader("Authorization", authorization);
 
