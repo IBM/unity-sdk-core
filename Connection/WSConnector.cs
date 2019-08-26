@@ -23,6 +23,7 @@ using IBM.Cloud.SDK.Utilities;
 using System.Collections;
 using System.Collections.Generic;
 using System.Security.Authentication;
+using IBM.Cloud.SDK.Authentication;
 using System.Threading;
 #if !NETFX_CORE
 using UnitySDK.WebSocketSharp;
@@ -172,7 +173,7 @@ namespace IBM.Cloud.SDK.Connection
         /// <summary>
         /// Credentials used to authenticate with the server.
         /// </summary>
-        public Credentials Authentication { get; set; }
+        public Authenticator Authentication { get; set; }
         /// <summary>
         /// The current state of this connector.
         /// </summary>
@@ -294,29 +295,23 @@ namespace IBM.Cloud.SDK.Connection
         /// <summary>
         /// Create a WSConnector for the given service and function. 
         /// </summary>
-        /// <param name="credentials">The credentials for the service.</param>
+        /// <param name="authenticator">The credentials for the service.</param>
         /// <param name="function">The name of the function to connect.</param>
         /// <param name="args">Additional function arguments.</param>
         /// <returns>The WSConnector object or null or error.</returns>
-        public static WSConnector CreateConnector(Credentials credentials, string function, string args)
+        public static WSConnector CreateConnector(Authenticator authenticator, string function, string args)
         {
             WSConnector connector = new WSConnector();
-            if (credentials.HasCredentials())
+            if (authenticator.AuthenticationType == "basic")
             {
-                connector.Authentication = credentials;
+                connector.Authentication = authenticator;
             }
-            else if (credentials.HasIamTokenData())
+            else if (authenticator.AuthenticationType == "iam" || authenticator.AuthenticationType == "cp4d")
             {
-                credentials.iamTokenManager.GetToken();
-                connector.Headers.Add(AUTHENTICATION_AUTHORIZATION_HEADER, string.Format("Bearer {0}", credentials.iamTokenManager.GetAccessToken()));
-            }
-            else if (credentials.HasIcp4dTokenData())
-            {
-                credentials.icp4dTokenManager.GetToken();
-                connector.Headers.Add(AUTHENTICATION_AUTHORIZATION_HEADER, string.Format("Bearer {0}", credentials.icp4dTokenManager.GetAccessToken()));
+                authenticator.Authenticate(connector);
             }
 
-            connector.URL = FixupURL(credentials.Url) + function + args;
+            connector.URL = FixupURL(authenticator.Url) + function + args;
 
             return connector;
         }
