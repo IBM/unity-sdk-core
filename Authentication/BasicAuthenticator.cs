@@ -81,6 +81,10 @@ namespace IBM.Cloud.SDK.Authentication.BasicAuth
         /// <param name="connector"></param>
         public override void Authenticate(RESTConnector connector)
         {
+            if (connector.Headers == null)
+            {
+                connector.Headers = new Dictionary<string,string>();;
+            }
             connector.Headers.Add("Authorization", Utility.CreateAuthorization(Username, Password));
         }
 

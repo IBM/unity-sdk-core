@@ -74,6 +74,24 @@ namespace IBM.Cloud.SDK.Authentication.Bearer
         /// <param name="connector"></param>
         public override void Authenticate(RESTConnector connector)
         {
+            if (connector.Headers == null)
+            {
+                connector.Headers = new Dictionary<string,string>();;
+            }
+            connector.Headers.Add("Authorization", string.Format("Bearer {0}", BearerToken));
+        }
+
+        /// <summary>
+        /// This method is called to authenticate an outgoing REST API request.
+        /// Here, we'll just set the Authorization header to provide the necessary authentication info.
+        /// </summary>
+        /// <param name="connector"></param>
+        public override void Authenticate(WSConnector connector)
+        {
+            if (connector.Headers == null)
+            {
+                connector.Headers = new Dictionary<string,string>();;
+            }
             connector.Headers.Add("Authorization", string.Format("Bearer {0}", BearerToken));
         }
 
