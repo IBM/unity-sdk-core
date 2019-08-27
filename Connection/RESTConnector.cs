@@ -258,7 +258,7 @@ namespace IBM.Cloud.SDK.Connection
         /// <summary>
         /// This function returns a RESTConnector object for the given service and function.
         /// </summary>
-        /// <param name="serviceID">The ID of the service.</param>
+        /// <param name="authenticator">Authenticator used to authenticate service.</param>
         /// <param name="function">The name of the function.</param>
         /// <returns>Returns a RESTConnector object or null on error.</returns>
         ///
@@ -304,31 +304,30 @@ namespace IBM.Cloud.SDK.Connection
 
         #region Authenticate request
         /// <summary>
-        /// Authenticate based on bearer token
+        /// Add Authentication headers
         /// </summary>
-        /// <param name="request">The request object.</param>
-        /// <returns>true is returned on success, false is returned if the Request can't be sent.</returns>
+        /// <param name="bearerToken">The bearer token to authenticate.</param>
         public void WithAuthentication(string bearerToken)
         {
             if (Headers == null)
             {
                Headers = new Dictionary<string,string>();;
             }
-            Headers.Add("Authorization", string.Format("Bearer {0}", bearerToken));
+            Headers.Add(AUTHENTICATION_AUTHORIZATION_HEADER, string.Format("Bearer {0}", bearerToken));
         }
 
         /// <summary>
-        /// Authenticate based on bearer token
+        /// Add Authentication headers
         /// </summary>
-        /// <param name="request">The request object.</param>
-        /// <returns>true is returned on success, false is returned if the Request can't be sent.</returns>
+        /// <param name="username">Username</param>
+        /// <param name="password">Password.</param>
         public void WithAuthentication(string username, string password)
         {
             if (Headers == null)
             {
                Headers = new Dictionary<string,string>();;
             }
-            Headers.Add("Authorization", Utility.CreateAuthorization(username, password));
+            Headers.Add(AUTHENTICATION_AUTHORIZATION_HEADER, Utility.CreateAuthorization(username, password));
         }
         #endregion
 

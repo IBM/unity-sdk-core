@@ -1241,8 +1241,7 @@ namespace IBM.Cloud.SDK.Utilities
         #region String to Double
         public static double StringToDouble(string input)
         {
-            double output;
-            double.TryParse(input, out output);
+            double.TryParse(input, out double output);
             return output;
         }
         #endregion
