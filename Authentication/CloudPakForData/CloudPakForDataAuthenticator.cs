@@ -99,7 +99,7 @@ namespace IBM.Cloud.SDK.Authentication.Cp4d
         /// Do we have TokenData?
         /// </summary>
         /// <returns></returns>
-        public override bool HasTokenData()
+        public override bool CanAuthenticate()
         {
             if (tokenData != null)
             {
@@ -111,6 +111,16 @@ namespace IBM.Cloud.SDK.Authentication.Cp4d
             }
         }
 
+        public override void Authenticate(RESTConnector connector)
+        {
+            connector.WithAuthentication(tokenData.AccessToken);
+        }
+
+        public override void Authenticate(WSConnector connector)
+        {
+            connector.WithAuthentication(tokenData.AccessToken);
+        }
+
         private void GetToken()
         {
             if (tokenData == null || !tokenData.IsTokenValid())
@@ -119,24 +129,6 @@ namespace IBM.Cloud.SDK.Authentication.Cp4d
             }
         }
 
-        public override void Authenticate(RESTConnector connector)
-        {
-            if (connector.Headers == null)
-            {
-                connector.Headers = new Dictionary<string,string>();;
-            }
-
-            connector.Headers.Add("Authorization", string.Format("Bearer {0}", tokenData.AccessToken));
-        }
-
-        public override void Authenticate(WSConnector connector)
-        {
-            if (connector.Headers == null)
-            {
-                connector.Headers = new Dictionary<string,string>();;
-            }
-            connector.Headers.Add("Authorization", string.Format("Bearer {0}", tokenData.AccessToken));
-        }
         private void OnGetToken(DetailedResponse<CloudPakForDataTokenResponse> response, IBMError error)
         {
             if (error != null)

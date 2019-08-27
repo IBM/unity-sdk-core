@@ -37,8 +37,6 @@ namespace IBM.Cloud.SDK.Authentication.Iam
         public string ClientId { get; set; }
         public string ClientSecret { get; set; }
         public Dictionary<string, string> Headers { get; set; }
-        private readonly string defaultUrl = "https://iam.cloud.ibm.com/identity/token";
-
         // This field holds an access token and its expiration time.
         private IamToken tokenData;
 
@@ -85,7 +83,7 @@ namespace IBM.Cloud.SDK.Authentication.Iam
 
             if (string.IsNullOrEmpty(url))
             {
-                url = defaultUrl;
+                url = DefaultIamUrl;
             }
             this.Url = url;
             if (!string.IsNullOrEmpty(clientId))
@@ -118,7 +116,7 @@ namespace IBM.Cloud.SDK.Authentication.Iam
         /// Do we have TokenData?
         /// </summary>
         /// <returns></returns>
-        public override bool HasTokenData()
+        public override bool CanAuthenticate()
         {
             if (tokenData != null)
             {
@@ -128,6 +126,16 @@ namespace IBM.Cloud.SDK.Authentication.Iam
             {
                 return false;
             }
+        }
+
+        public override void Authenticate(RESTConnector connector)
+        {
+            connector.WithAuthentication(tokenData.AccessToken);
+        }
+
+        public override void Authenticate(WSConnector connector)
+        {
+            connector.WithAuthentication(tokenData.AccessToken);
         }
 
         private void OnGetToken(DetailedResponse<IamTokenResponse> response, IBMError error)
@@ -148,25 +156,6 @@ namespace IBM.Cloud.SDK.Authentication.Iam
                 RequestToken(OnGetToken);
             }
         }
-
-        public override void Authenticate(RESTConnector connector)
-        {
-            if (connector.Headers == null)
-            {
-                connector.Headers = new Dictionary<string,string>();;
-            }
-            connector.Headers.Add("Authorization", string.Format("Bearer {0}", tokenData.AccessToken));
-        }
-
-        public override void Authenticate(WSConnector connector)
-        {
-            if (connector.Headers == null)
-            {
-                connector.Headers = new Dictionary<string,string>();;
-            }
-            connector.Headers.Add("Authorization", string.Format("Bearer {0}", tokenData.AccessToken));
-        }
-
 
         #region Request Token
         /// <summary>

@@ -62,6 +62,15 @@ namespace IBM.Cloud.SDK.Authentication.Bearer
             Validate();
         }
 
+        /// <summary>
+        /// Do we have BearerToken?
+        /// </summary>
+        /// <returns></returns>
+        public override bool CanAuthenticate()
+        {
+            return BearerToken != null;
+        }
+
         public override string AuthenticationType
         {
             get { return AuthTypeBearer; }
@@ -74,11 +83,7 @@ namespace IBM.Cloud.SDK.Authentication.Bearer
         /// <param name="connector"></param>
         public override void Authenticate(RESTConnector connector)
         {
-            if (connector.Headers == null)
-            {
-                connector.Headers = new Dictionary<string,string>();;
-            }
-            connector.Headers.Add("Authorization", string.Format("Bearer {0}", BearerToken));
+            connector.WithAuthentication(BearerToken);
         }
 
         /// <summary>
@@ -88,11 +93,7 @@ namespace IBM.Cloud.SDK.Authentication.Bearer
         /// <param name="connector"></param>
         public override void Authenticate(WSConnector connector)
         {
-            if (connector.Headers == null)
-            {
-                connector.Headers = new Dictionary<string,string>();;
-            }
-            connector.Headers.Add("Authorization", string.Format("Bearer {0}", BearerToken));
+            connector.WithAuthentication(BearerToken);
         }
 
         public override void Validate()

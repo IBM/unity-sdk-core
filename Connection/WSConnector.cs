@@ -140,6 +140,36 @@ namespace IBM.Cloud.SDK.Connection
         };
         #endregion
 
+        #region Authenticate request
+        /// <summary>
+        /// Authenticate based on bearer token
+        /// </summary>
+        /// <param name="request">The request object.</param>
+        /// <returns>true is returned on success, false is returned if the Request can't be sent.</returns>
+        public void WithAuthentication(string bearerToken)
+        {
+            if (Headers == null)
+            {
+               Headers = new Dictionary<string,string>();;
+            }
+            Headers.Add("Authorization", string.Format("Bearer {0}", bearerToken));
+        }
+
+        /// <summary>
+        /// Authenticate based on bearer token
+        /// </summary>
+        /// <param name="request">The request object.</param>
+        /// <returns>true is returned on success, false is returned if the Request can't be sent.</returns>
+        public void WithAuthentication(string username, string password)
+        {
+            if (Headers == null)
+            {
+               Headers = new Dictionary<string,string>();;
+            }
+            Headers.Add("Authorization", Utility.CreateAuthorization(username, password));
+        }
+        #endregion
+
         #region Public Properties
         /// <summary>
         /// This delegate is invoked when the connection is closed.
@@ -302,14 +332,7 @@ namespace IBM.Cloud.SDK.Connection
         public static WSConnector CreateConnector(Authenticator authenticator, string function, string args)
         {
             WSConnector connector = new WSConnector();
-            if (authenticator.AuthenticationType == "basic")
-            {
-                connector.Authentication = authenticator;
-            }
-            else if (authenticator.AuthenticationType == "iam" || authenticator.AuthenticationType == "cp4d")
-            {
-                authenticator.Authenticate(connector);
-            }
+            connector.Authentication = authenticator;
 
             connector.URL = FixupURL(authenticator.Url) + function + args;
 

@@ -302,6 +302,36 @@ namespace IBM.Cloud.SDK.Connection
         }
         #endregion
 
+        #region Authenticate request
+        /// <summary>
+        /// Authenticate based on bearer token
+        /// </summary>
+        /// <param name="request">The request object.</param>
+        /// <returns>true is returned on success, false is returned if the Request can't be sent.</returns>
+        public void WithAuthentication(string bearerToken)
+        {
+            if (Headers == null)
+            {
+               Headers = new Dictionary<string,string>();;
+            }
+            Headers.Add("Authorization", string.Format("Bearer {0}", bearerToken));
+        }
+
+        /// <summary>
+        /// Authenticate based on bearer token
+        /// </summary>
+        /// <param name="request">The request object.</param>
+        /// <returns>true is returned on success, false is returned if the Request can't be sent.</returns>
+        public void WithAuthentication(string username, string password)
+        {
+            if (Headers == null)
+            {
+               Headers = new Dictionary<string,string>();;
+            }
+            Headers.Add("Authorization", Utility.CreateAuthorization(username, password));
+        }
+        #endregion
+
         #region Private Data
         private int _activeConnections = 0;
         private Queue<Request> _requests = new Queue<Request>();

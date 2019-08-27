@@ -57,9 +57,9 @@ namespace IBM.Cloud.SDK.Authentication
         virtual public string AuthenticationType { get; }
 
         /// <summary>
-        /// Check if token data is available.
+        /// Check if authenticator has everything it needs to authenticate. Every child class overrides this method.
         /// </summary>
-        virtual public bool HasTokenData() {
+        virtual public bool CanAuthenticate() {
             return false;
         }
 

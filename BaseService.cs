@@ -27,18 +27,12 @@ namespace IBM.Cloud.SDK
     public class BaseService
     {
         protected Authenticator authenticator;
-        protected string Url;
+        protected string url;
         public string ServiceId { get; set; }
         protected Dictionary<string, string> customRequestHeaders = new Dictionary<string, string>();
         public static string PropNameServiceUrl = "URL";
-        public static string propnameDisableSsl = "DISABLE_SSL";
+        public static string PropNameServiceDisableSslVerification = "DISABLE_SSL";
         private const string ErrorMessageNoAuthenticator = "Authentication information was not properly configured.";
-        public BaseService(string serviceId)
-        {
-            authenticator = ConfigBasedAuthenticatorFactory.GetAuthenticator(serviceId);
-        }
-
-        public BaseService(string versionDate, string serviceId) : this(serviceId) { }
 
         public BaseService(string versionDate, Authenticator authenticator, string serviceId) : this(authenticator, serviceId) { }
 
@@ -54,25 +48,6 @@ namespace IBM.Cloud.SDK
             {
                 SetEndpoint(url);
             }
-
-            // Check to see if "disable ssl" was set in the service properties.
-            // bool disableSsl = false;
-            // props.TryGetValue(PropNameServiceDisableSslVerification, out string tempDisableSsl);
-            // if (!string.IsNullOrEmpty(tempDisableSsl))
-            // {
-            //     bool.TryParse(tempDisableSsl, out disableSsl);
-            // }
-
-            // DisableSslVerification(disableSsl);
-        }
-
-        protected BaseService(string versionDate, string serviceId, string url)
-        {
-            ServiceId = serviceId;
-            authenticator = new NoAuthAuthenticator();
-
-            if (!string.IsNullOrEmpty(url))
-                Url = url;
         }
 
         protected void SetAuthentication(RESTConnector connector)
@@ -87,9 +62,9 @@ namespace IBM.Cloud.SDK
             }
         }
 
-        public void SetEndpoint(string url)
+        public void SetEndpoint(string endpoint)
         {
-            Url = url;
+            url = endpoint;
         }
 
         /// <summary>

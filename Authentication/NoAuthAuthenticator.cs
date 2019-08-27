@@ -28,6 +28,15 @@ namespace IBM.Cloud.SDK.Authentication.NoAuth
 
         public NoAuthAuthenticator(Dictionary<string, string> config) { }
 
+        /// <summary>
+        /// Always return true
+        /// </summary>
+        /// <returns></returns>
+        public override bool CanAuthenticate()
+        {
+            return true;
+        }
+
         public override string AuthenticationType
         {
             get { return AuthTypeNoAuth; }

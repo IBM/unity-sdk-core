@@ -75,17 +75,22 @@ namespace IBM.Cloud.SDK.Authentication.BasicAuth
         }
 
         /// <summary>
+        /// BasicAuthenticator is not waiting for token data so always return true.
+        /// </summary>
+        /// <returns></returns>
+        public override bool CanAuthenticate()
+        {
+            return true;
+        }
+
+        /// <summary>
         /// This method is called to authenticate an outgoing REST API request.
         /// Here, we'll just set the Authorization header to provide the necessary authentication info.
         /// </summary>
         /// <param name="connector"></param>
         public override void Authenticate(RESTConnector connector)
         {
-            if (connector.Headers == null)
-            {
-                connector.Headers = new Dictionary<string,string>();;
-            }
-            connector.Headers.Add("Authorization", Utility.CreateAuthorization(Username, Password));
+            connector.WithAuthentication(Username, Password);
         }
 
         /// <summary>
@@ -95,11 +100,7 @@ namespace IBM.Cloud.SDK.Authentication.BasicAuth
         /// <param name="connector"></param>
         public override void Authenticate(WSConnector connector)
         {
-            if (connector.Headers == null)
-            {
-                connector.Headers = new Dictionary<string,string>();;
-            }
-            connector.Headers.Add("Authorization", Utility.CreateAuthorization(Username, Password));
+            connector.WithAuthentication(Username, Password);
         }
 
         public override void Validate()
