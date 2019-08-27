@@ -438,8 +438,6 @@ namespace IBM.Cloud.SDK.Connection
                 ws = new WebSocket(URL);
                 if (Headers != null)
                     ws.CustomHeaders = Headers;
-                if (Authentication != null)
-                    ws.SetCredentials(Authentication.Username, Authentication.Password, true);
                 ws.OnOpen += OnWSOpen;
                 ws.OnClose += OnWSClose;
                 ws.OnError += OnWSError;
@@ -534,12 +532,6 @@ namespace IBM.Cloud.SDK.Connection
             try
             {
                 MessageWebSocket webSocket = new MessageWebSocket();
-
-                if (Authentication != null)
-                {
-                    PasswordCredential credential = new PasswordCredential(Authentication.Url, Authentication.Username, Authentication.Password);
-                    webSocket.Control.ServerCredential = credential;
-                }
 
                 webSocket.MessageReceived += WebSocket_MessageReceived;
                 webSocket.Closed += WebSocket_Closed;

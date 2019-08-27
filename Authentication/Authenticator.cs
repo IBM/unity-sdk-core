@@ -48,8 +48,6 @@ namespace IBM.Cloud.SDK.Authentication
         public static string ErrorMessageReqFailed = "Error while fetching access token from token service: ";
 
         public string Url { get; set; }
-        public string Username { get; private set; }
-        public string Password { get; private set; }
 
         /// <summary>
         /// Returns the authentication type associated with the Authenticator instance.
