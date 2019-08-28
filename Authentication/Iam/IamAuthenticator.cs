@@ -192,7 +192,7 @@ namespace IBM.Cloud.SDK.Authentication.Iam
             req.Headers.Add("Content-type", "application/x-www-form-urlencoded");
             req.Headers.Add("Authorization", Utility.CreateAuthorization(clientId, clientSecret));
             req.OnResponse = OnRequestIamTokenResponse;
-            req.DisableSslVerification = false;
+            req.DisableSslVerification = DisableSslVerification;
             req.Forms = new Dictionary<string, RESTConnector.Form>();
             req.Forms[GrantType] = new RESTConnector.Form(RequestGrantType);
             req.Forms[ApikeyConst] = new RESTConnector.Form(Apikey);
