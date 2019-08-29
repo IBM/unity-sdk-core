@@ -29,6 +29,8 @@ using UnityEngine.Networking;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using MiniJSON;
+using IBM.Cloud.SDK.Authentication;
+using Utility = IBM.Cloud.SDK.Utilities.Utility;
 
 #if !NETFX_CORE
 using System.Net;
@@ -220,11 +222,11 @@ namespace IBM.Cloud.SDK.Connection
             /// The http method for use with UnityWebRequest.
             /// </summary>
             public string HttpMethod { get; set; }
-            private bool disableSslVerification = false;
+            private bool? disableSslVerification = false;
             /// <summary>
             /// Gets and sets the option to disable ssl verification
             /// </summary>
-            public bool DisableSslVerification
+            public bool? DisableSslVerification
             {
                 get { return disableSslVerification; }
                 set { disableSslVerification = value; }
@@ -246,7 +248,7 @@ namespace IBM.Cloud.SDK.Connection
         /// <summary>
         /// Credentials used to authenticate with the server.
         /// </summary>
-        public Credentials Authentication { get; set; }
+        public Authenticator Authentication { get; set; }
         /// <summary>
         /// Additional headers to attach to all requests.
         /// </summary>
@@ -254,30 +256,19 @@ namespace IBM.Cloud.SDK.Connection
         #endregion
 
         /// <summary>
-        /// This function returns a RESTConnector object for the given service and function. 
+        /// This function returns a RESTConnector object for the given service and function.
         /// </summary>
-        /// <param name="serviceID">The ID of the service.</param>
+        /// <param name="authenticator">Authenticator used to authenticate service.</param>
         /// <param name="function">The name of the function.</param>
         /// <returns>Returns a RESTConnector object or null on error.</returns>
         ///
-
-
-        public static RESTConnector GetConnector(Credentials credentials, string function)
+        public static RESTConnector GetConnector(Authenticator authenticator, string function)
         {
             RESTConnector connector = new RESTConnector
             {
-                URL = credentials.Url + function,
-                Authentication = credentials
+                URL = authenticator.Url + function,
+                Authentication = authenticator
             };
-
-            if (connector.Authentication.HasIamTokenData())
-            {
-                connector.Authentication.iamTokenManager.GetToken();
-            }
-            else if (connector.Authentication.HasIcp4dTokenData())
-            {
-                connector.Authentication.icp4dTokenManager.GetToken();
-            }
             return connector;
         }
 
@@ -311,6 +302,35 @@ namespace IBM.Cloud.SDK.Connection
         }
         #endregion
 
+        #region Authenticate request
+        /// <summary>
+        /// Add Authentication headers
+        /// </summary>
+        /// <param name="bearerToken">The bearer token to authenticate.</param>
+        public void WithAuthentication(string bearerToken)
+        {
+            if (Headers == null)
+            {
+               Headers = new Dictionary<string,string>();;
+            }
+            Headers.Add(AUTHENTICATION_AUTHORIZATION_HEADER, string.Format("Bearer {0}", bearerToken));
+        }
+
+        /// <summary>
+        /// Add Authentication headers
+        /// </summary>
+        /// <param name="username">Username</param>
+        /// <param name="password">Password.</param>
+        public void WithAuthentication(string username, string password)
+        {
+            if (Headers == null)
+            {
+               Headers = new Dictionary<string,string>();;
+            }
+            Headers.Add(AUTHENTICATION_AUTHORIZATION_HEADER, Utility.CreateAuthorization(username, password));
+        }
+        #endregion
+
         #region Private Data
         private int _activeConnections = 0;
         private Queue<Request> _requests = new Queue<Request>();
@@ -319,26 +339,6 @@ namespace IBM.Cloud.SDK.Connection
         #region Private Functions
         private void AddHeaders(Dictionary<string, string> headers)
         {
-            if (Authentication != null)
-            {
-                if (headers == null)
-                {
-                    throw new ArgumentNullException("headers");
-                }
-
-                if (Authentication.HasCredentials())
-                {
-                    headers.Add(AUTHENTICATION_AUTHORIZATION_HEADER, Authentication.CreateAuthorization());
-                }
-                else if (Authentication.HasIamTokenData())
-                {
-                    headers.Add(AUTHENTICATION_AUTHORIZATION_HEADER, string.Format("Bearer {0}", Authentication.iamTokenManager.GetAccessToken()));
-                }
-                else if (Authentication.HasIcp4dTokenData())
-                {
-                   headers.Add(AUTHENTICATION_AUTHORIZATION_HEADER, string.Format("Bearer {0}", Authentication.icp4dTokenManager.GetAccessToken()));
-                }
-            }
 
             if (Headers != null)
             {
@@ -508,7 +508,7 @@ namespace IBM.Cloud.SDK.Connection
 
                 unityWebRequest.downloadHandler = new DownloadHandlerBuffer();
 
-                if (req.DisableSslVerification)
+                if (req.DisableSslVerification == true)
                 {
                     unityWebRequest.certificateHandler = new AcceptAllCertificates();
                 }

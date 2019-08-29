@@ -23,6 +23,7 @@ using IBM.Cloud.SDK.Utilities;
 using System.Collections;
 using System.Collections.Generic;
 using System.Security.Authentication;
+using IBM.Cloud.SDK.Authentication;
 using System.Threading;
 #if !NETFX_CORE
 using UnitySDK.WebSocketSharp;
@@ -139,6 +140,35 @@ namespace IBM.Cloud.SDK.Connection
         };
         #endregion
 
+        #region Authenticate request
+        /// <summary>
+        /// Add Authentication headers
+        /// </summary>
+        /// <param name="bearerToken">The bearer token to authenticate.</param>
+        public void WithAuthentication(string bearerToken)
+        {
+            if (Headers == null)
+            {
+               Headers = new Dictionary<string,string>();;
+            }
+            Headers.Add(AUTHENTICATION_AUTHORIZATION_HEADER, string.Format("Bearer {0}", bearerToken));
+        }
+
+        /// <summary>
+        /// Add Authentication headers
+        /// </summary>
+        /// <param name="username">Username</param>
+        /// <param name="password">Password.</param>
+        public void WithAuthentication(string username, string password)
+        {
+            if (Headers == null)
+            {
+               Headers = new Dictionary<string,string>();;
+            }
+            Headers.Add(AUTHENTICATION_AUTHORIZATION_HEADER, Utility.CreateAuthorization(username, password));
+        }
+        #endregion
+
         #region Public Properties
         /// <summary>
         /// This delegate is invoked when the connection is closed.
@@ -172,7 +202,7 @@ namespace IBM.Cloud.SDK.Connection
         /// <summary>
         /// Credentials used to authenticate with the server.
         /// </summary>
-        public Credentials Authentication { get; set; }
+        public Authenticator Authentication { get; set; }
         /// <summary>
         /// The current state of this connector.
         /// </summary>
@@ -294,29 +324,16 @@ namespace IBM.Cloud.SDK.Connection
         /// <summary>
         /// Create a WSConnector for the given service and function. 
         /// </summary>
-        /// <param name="credentials">The credentials for the service.</param>
+        /// <param name="authenticator">The authenticator for the service.</param>
         /// <param name="function">The name of the function to connect.</param>
         /// <param name="args">Additional function arguments.</param>
         /// <returns>The WSConnector object or null or error.</returns>
-        public static WSConnector CreateConnector(Credentials credentials, string function, string args)
+        public static WSConnector CreateConnector(Authenticator authenticator, string function, string args)
         {
             WSConnector connector = new WSConnector();
-            if (credentials.HasCredentials())
-            {
-                connector.Authentication = credentials;
-            }
-            else if (credentials.HasIamTokenData())
-            {
-                credentials.iamTokenManager.GetToken();
-                connector.Headers.Add(AUTHENTICATION_AUTHORIZATION_HEADER, string.Format("Bearer {0}", credentials.iamTokenManager.GetAccessToken()));
-            }
-            else if (credentials.HasIcp4dTokenData())
-            {
-                credentials.icp4dTokenManager.GetToken();
-                connector.Headers.Add(AUTHENTICATION_AUTHORIZATION_HEADER, string.Format("Bearer {0}", credentials.icp4dTokenManager.GetAccessToken()));
-            }
+            connector.Authentication = authenticator;
 
-            connector.URL = FixupURL(credentials.Url) + function + args;
+            connector.URL = FixupURL(authenticator.Url) + function + args;
 
             return connector;
         }
@@ -420,8 +437,6 @@ namespace IBM.Cloud.SDK.Connection
                 ws = new WebSocket(URL);
                 if (Headers != null)
                     ws.CustomHeaders = Headers;
-                if (Authentication != null)
-                    ws.SetCredentials(Authentication.Username, Authentication.Password, true);
                 ws.OnOpen += OnWSOpen;
                 ws.OnClose += OnWSClose;
                 ws.OnError += OnWSError;
@@ -516,12 +531,6 @@ namespace IBM.Cloud.SDK.Connection
             try
             {
                 MessageWebSocket webSocket = new MessageWebSocket();
-
-                if (Authentication != null)
-                {
-                    PasswordCredential credential = new PasswordCredential(Authentication.Url, Authentication.Username, Authentication.Password);
-                    webSocket.Control.ServerCredential = credential;
-                }
 
                 webSocket.MessageReceived += WebSocket_MessageReceived;
                 webSocket.Closed += WebSocket_Closed;
