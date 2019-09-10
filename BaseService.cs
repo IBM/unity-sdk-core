@@ -27,7 +27,7 @@ namespace IBM.Cloud.SDK
     public class BaseService
     {
         protected Authenticator authenticator;
-        protected string url;
+        protected string serviceUrl;
         public string ServiceId { get; set; }
         protected Dictionary<string, string> customRequestHeaders = new Dictionary<string, string>();
         public static string PropNameServiceUrl = "URL";
@@ -46,7 +46,7 @@ namespace IBM.Cloud.SDK
             props.TryGetValue(PropNameServiceUrl, out string url);
             if (!string.IsNullOrEmpty(url))
             {
-                SetEndpoint(url);
+                SetServiceUrl(url);
             }
         }
 
@@ -62,9 +62,9 @@ namespace IBM.Cloud.SDK
             }
         }
 
-        public void SetEndpoint(string endpoint)
+        public void SetServiceUrl(string url)
         {
-            url = endpoint;
+            serviceUrl = url;
         }
 
         /// <summary>
