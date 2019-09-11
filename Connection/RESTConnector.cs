@@ -262,11 +262,16 @@ namespace IBM.Cloud.SDK.Connection
         /// <param name="function">The name of the function.</param>
         /// <returns>Returns a RESTConnector object or null on error.</returns>
         ///
-        public static RESTConnector GetConnector(Authenticator authenticator, string function)
+        public static RESTConnector GetConnector(Authenticator authenticator, string function, string url)
         {
+            if (Utility.HasBadFirstOrLastCharacter(url))
+            {
+                throw new ArgumentException("The Url property is invalid. Please remove any surrounding {{, }}, or \" characters.");
+            }
+
             RESTConnector connector = new RESTConnector
             {
-                URL = authenticator.Url + function,
+                URL = url + function,
                 Authentication = authenticator
             };
             return connector;

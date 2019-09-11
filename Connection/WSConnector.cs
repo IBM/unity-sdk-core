@@ -25,10 +25,10 @@ using System.Collections.Generic;
 using System.Security.Authentication;
 using IBM.Cloud.SDK.Authentication;
 using System.Threading;
+using System;
 #if !NETFX_CORE
 using UnitySDK.WebSocketSharp;
 #else
-using System;
 using System.Threading.Tasks;
 using Windows.Networking.Sockets;
 using Windows.Security.Credentials;
@@ -328,12 +328,17 @@ namespace IBM.Cloud.SDK.Connection
         /// <param name="function">The name of the function to connect.</param>
         /// <param name="args">Additional function arguments.</param>
         /// <returns>The WSConnector object or null or error.</returns>
-        public static WSConnector CreateConnector(Authenticator authenticator, string function, string args)
+        public static WSConnector CreateConnector(Authenticator authenticator, string function, string args, string url)
         {
+            if (Utility.HasBadFirstOrLastCharacter(url))
+            {
+                throw new ArgumentException("The Url property is invalid. Please remove any surrounding {{, }}, or \" characters.");
+            }
+
             WSConnector connector = new WSConnector();
             connector.Authentication = authenticator;
 
-            connector.URL = FixupURL(authenticator.Url) + function + args;
+            connector.URL = FixupURL(url) + function + args;
 
             return connector;
         }
