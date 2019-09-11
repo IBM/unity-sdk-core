@@ -339,6 +339,7 @@ namespace IBM.Cloud.SDK.Connection
             connector.Authentication = authenticator;
 
             connector.URL = FixupURL(url) + function + args;
+            authenticator.Authenticate(connector);
 
             return connector;
         }

@@ -274,6 +274,8 @@ namespace IBM.Cloud.SDK.Connection
                 URL = url + function,
                 Authentication = authenticator
             };
+
+            authenticator.Authenticate(connector);
             return connector;
         }
 
