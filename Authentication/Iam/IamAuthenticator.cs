@@ -73,7 +73,6 @@ namespace IBM.Cloud.SDK.Authentication.Iam
             config.TryGetValue(PropNameClientSecret, out string clientSecret);
             config.TryGetValue(PropNameDisableSslVerification, out string disableSslVerficiationString);
             bool.TryParse(disableSslVerficiationString, out bool disableSslVerification);
-            Log.Debug("IamAuthenticator:{0} {1} {2} {3}", apikey);
             Init(apikey, url, clientId, clientSecret, disableSslVerification);
         }
 
@@ -168,19 +167,6 @@ namespace IBM.Cloud.SDK.Authentication.Iam
             if (callback == null)
                 throw new ArgumentNullException("successCallback");
 
-            // Use bx:bx as default auth header creds.
-            var clientId = "bx";
-            var clientSecret = "bx";
-
-            // If both the clientId and secret were specified by the user, then use them.
-            if (!string.IsNullOrEmpty(ClientId) && !string.IsNullOrEmpty(ClientSecret))
-            {
-                Log.Debug("not null: {0}", ClientId);
-
-                clientId = ClientId;
-                clientSecret = ClientSecret;
-            }
-
             RESTConnector connector = new RESTConnector();
             connector.URL = Url;
             if (connector == null)
@@ -190,7 +176,11 @@ namespace IBM.Cloud.SDK.Authentication.Iam
             req.Callback = callback;
             req.HttpMethod = UnityWebRequest.kHttpVerbGET;
             req.Headers.Add("Content-type", "application/x-www-form-urlencoded");
-            req.Headers.Add("Authorization", Utility.CreateAuthorization(clientId, clientSecret));
+            // If both the clientId and secret were specified by the user, then use them.
+            if (!string.IsNullOrEmpty(ClientId) && !string.IsNullOrEmpty(ClientSecret))
+            {
+                req.Headers.Add("Authorization", Utility.CreateAuthorization(ClientId, ClientSecret));
+            }
             req.OnResponse = OnRequestIamTokenResponse;
             req.DisableSslVerification = DisableSslVerification;
             req.Forms = new Dictionary<string, RESTConnector.Form>();
@@ -250,9 +240,10 @@ namespace IBM.Cloud.SDK.Authentication.Iam
                 throw new ArgumentException(string.Format(ErrorMessagePropInvalid, "url"));
             }
 
-            if (string.IsNullOrEmpty(ClientSecret) || string.IsNullOrEmpty(ClientId))
+            if (!string.IsNullOrEmpty(ClientSecret) && string.IsNullOrEmpty(ClientId) || string.IsNullOrEmpty(ClientSecret) && !string.IsNullOrEmpty(ClientId))
             {
-                Log.Warning("IamTokenManager():", "Warning: Client ID and Secret must BOTH be given, or the defaults will be used.");
+
+                throw new ArgumentException("Client ID and Secret must BOTH be provided.");
             }
         }
     }

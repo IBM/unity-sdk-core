@@ -330,6 +330,11 @@ namespace IBM.Cloud.SDK.Connection
         /// <returns>The WSConnector object or null or error.</returns>
         public static WSConnector CreateConnector(Authenticator authenticator, string function, string args, string url)
         {
+            if (string.IsNullOrEmpty(url))
+            {
+                throw new ArgumentNullException("The Url must not be empty or null.");
+            }
+
             if (Utility.HasBadFirstOrLastCharacter(url))
             {
                 throw new ArgumentException("The Url property is invalid. Please remove any surrounding {{, }}, or \" characters.");

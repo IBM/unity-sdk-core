@@ -264,6 +264,11 @@ namespace IBM.Cloud.SDK.Connection
         ///
         public static RESTConnector GetConnector(Authenticator authenticator, string function, string url)
         {
+            if (string.IsNullOrEmpty(url))
+            {
+                throw new ArgumentNullException("The Url must not be empty or null.");
+            }
+
             if (Utility.HasBadFirstOrLastCharacter(url))
             {
                 throw new ArgumentException("The Url property is invalid. Please remove any surrounding {{, }}, or \" characters.");
