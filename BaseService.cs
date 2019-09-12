@@ -26,8 +26,12 @@ namespace IBM.Cloud.SDK
 {
     public class BaseService
     {
-        protected Authenticator authenticator;
-        protected string url;
+        #region Authenticator
+        /// <summary>
+        /// Gets and sets the authenticator of the service.
+        public Authenticator Authenticator { get; set; }
+        #endregion
+        protected string serviceUrl;
         public string ServiceId { get; set; }
         protected Dictionary<string, string> customRequestHeaders = new Dictionary<string, string>();
         public static string PropNameServiceUrl = "URL";
@@ -39,32 +43,24 @@ namespace IBM.Cloud.SDK
         public BaseService(Authenticator authenticator, string serviceId) {
             ServiceId = serviceId;
 
-            this.authenticator = authenticator ?? throw new ArgumentNullException(ErrorMessageNoAuthenticator);
-
+            Authenticator = authenticator ?? throw new ArgumentNullException(ErrorMessageNoAuthenticator);
             // Try to retrieve the service URL from either a credential file, environment, or VCAP_SERVICES.
             Dictionary<string, string> props = CredentialUtils.GetServiceProperties(serviceId);
             props.TryGetValue(PropNameServiceUrl, out string url);
             if (!string.IsNullOrEmpty(url))
             {
-                SetEndpoint(url);
+                SetServiceUrl(url);
             }
         }
 
-        protected void SetAuthentication(RESTConnector connector)
+        public void SetServiceUrl(string url)
         {
-            if (authenticator != null)
-            {
-                authenticator.Authenticate(connector);
-            }
-            else
-            {
-                throw new ArgumentException("Authentication information was not properly configured.");
-            }
+            serviceUrl = url;
         }
 
-        public void SetEndpoint(string endpoint)
+        public string GetServiceUrl()
         {
-            url = endpoint;
+            return serviceUrl;
         }
 
         /// <summary>
@@ -72,7 +68,7 @@ namespace IBM.Cloud.SDK
         /// </summary>
         public Authenticator GetAuthenticator()
         {
-            return authenticator;
+            return Authenticator;
         }
 
         public void WithHeader(string name, string value)
