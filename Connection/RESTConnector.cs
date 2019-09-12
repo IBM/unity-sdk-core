@@ -260,23 +260,24 @@ namespace IBM.Cloud.SDK.Connection
         /// </summary>
         /// <param name="authenticator">Authenticator used to authenticate service.</param>
         /// <param name="function">The name of the function.</param>
+        /// <param name="serviceUrl">Service Url to connect to.</param>
         /// <returns>Returns a RESTConnector object or null on error.</returns>
         ///
-        public static RESTConnector GetConnector(Authenticator authenticator, string function, string url)
+        public static RESTConnector GetConnector(Authenticator authenticator, string function, string serviceUrl)
         {
-            if (string.IsNullOrEmpty(url))
+            if (string.IsNullOrEmpty(serviceUrl))
             {
-                throw new ArgumentNullException("The Url must not be empty or null.");
+                throw new ArgumentNullException("The serviceUrl must not be empty or null.");
             }
 
-            if (Utility.HasBadFirstOrLastCharacter(url))
+            if (Utility.HasBadFirstOrLastCharacter(serviceUrl))
             {
-                throw new ArgumentException("The Url property is invalid. Please remove any surrounding {{, }}, or \" characters.");
+                throw new ArgumentException("The serviceUrl property is invalid. Please remove any surrounding {{, }}, or \" characters.");
             }
 
             RESTConnector connector = new RESTConnector
             {
-                URL = url + function,
+                URL = serviceUrl + function,
                 Authentication = authenticator
             };
 

@@ -58,6 +58,11 @@ namespace IBM.Cloud.SDK
             serviceUrl = url;
         }
 
+        public string GetServiceUrl()
+        {
+            return serviceUrl;
+        }
+
         /// <summary>
         /// Returns the authenticator for the service.
         /// </summary>

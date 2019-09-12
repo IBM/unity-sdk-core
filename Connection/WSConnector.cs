@@ -322,28 +322,29 @@ namespace IBM.Cloud.SDK.Connection
         }
 
         /// <summary>
-        /// Create a WSConnector for the given service and function. 
+        /// Create a WSConnector for the given service and function.
         /// </summary>
         /// <param name="authenticator">The authenticator for the service.</param>
         /// <param name="function">The name of the function to connect.</param>
         /// <param name="args">Additional function arguments.</param>
+        /// <param name="serviceUrl">Service Url to connect to.</param>
         /// <returns>The WSConnector object or null or error.</returns>
-        public static WSConnector CreateConnector(Authenticator authenticator, string function, string args, string url)
+        public static WSConnector CreateConnector(Authenticator authenticator, string function, string args, string serviceUrl)
         {
-            if (string.IsNullOrEmpty(url))
+            if (string.IsNullOrEmpty(serviceUrl))
             {
-                throw new ArgumentNullException("The Url must not be empty or null.");
+                throw new ArgumentNullException("The serviceUrl must not be empty or null.");
             }
 
-            if (Utility.HasBadFirstOrLastCharacter(url))
+            if (Utility.HasBadFirstOrLastCharacter(serviceUrl))
             {
-                throw new ArgumentException("The Url property is invalid. Please remove any surrounding {{, }}, or \" characters.");
+                throw new ArgumentException("The serviceUrl property is invalid. Please remove any surrounding {{, }}, or \" characters.");
             }
 
             WSConnector connector = new WSConnector();
             connector.Authentication = authenticator;
 
-            connector.URL = FixupURL(url) + function + args;
+            connector.URL = FixupURL(serviceUrl) + function + args;
             authenticator.Authenticate(connector);
 
             return connector;
