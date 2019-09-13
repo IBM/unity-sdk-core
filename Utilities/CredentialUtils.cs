@@ -133,6 +133,15 @@ namespace IBM.Cloud.SDK.Utilities
                 files.Add(userSpecifedPath);
             }
 
+            if (!string.IsNullOrEmpty(projectDirectory))
+            {
+                var fullPath = Path.GetFullPath(Path.Combine(projectDirectory, defaultCredentialFileName));
+                if (File.Exists(fullPath))
+                {
+                    files.Add(fullPath);
+                }
+            }
+
             if (!string.IsNullOrEmpty(unixHomeDirectory))
             {
                 var fullPath = Path.GetFullPath(Path.Combine(unixHomeDirectory, defaultCredentialFileName));
@@ -154,15 +163,6 @@ namespace IBM.Cloud.SDK.Utilities
             if (!string.IsNullOrEmpty(windowsSecondHomeDirectory))
             {
                 var fullPath = Path.GetFullPath(Path.Combine(windowsSecondHomeDirectory, defaultCredentialFileName));
-                if (File.Exists(fullPath))
-                {
-                    files.Add(fullPath);
-                }
-            }
-
-            if (!string.IsNullOrEmpty(projectDirectory))
-            {
-                var fullPath = Path.GetFullPath(Path.Combine(projectDirectory, defaultCredentialFileName));
                 if (File.Exists(fullPath))
                 {
                     files.Add(fullPath);
