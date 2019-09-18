@@ -100,10 +100,6 @@ namespace IBM.Cloud.SDK.Authentication
             {
                 authenticator = new BearerTokenAuthenticator(props);
             }
-            else
-            {
-                throw new ArgumentException(string.Format(ErrorMessageAuthTypeUnknown, authType));
-            }
 
             return authenticator;
         }
