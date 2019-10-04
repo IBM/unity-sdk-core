@@ -27,7 +27,7 @@ using IBM.Cloud.SDK.Authentication;
 using System.Threading;
 using System;
 #if !NETFX_CORE
-using UnitySDK.WebSocketSharp;
+using IBM.Cloud.SDK.Plugins.WebSocketSharp;
 #else
 using System.Threading.Tasks;
 using Windows.Networking.Sockets;
