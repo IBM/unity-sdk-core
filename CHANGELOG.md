@@ -1,3 +1,27 @@
+# [1.0.0](https://github.com/IBM/unity-sdk-core/compare/v0.3.0...v1.0.0) (2019-10-04)
+
+
+### Bug Fixes
+
+* fix name for CP4DTokenResponse ([0f71b32](https://github.com/IBM/unity-sdk-core/commit/0f71b32))
+
+
+### Features
+
+* **auth:** add new authenticator methods ([6716d05](https://github.com/IBM/unity-sdk-core/commit/6716d05))
+* **Authentication:** make auth type case insesitive ([4f468e6](https://github.com/IBM/unity-sdk-core/commit/4f468e6))
+* **base:** add support for authenticator in base service ([349bc1b](https://github.com/IBM/unity-sdk-core/commit/349bc1b))
+* **connectors:** update connectors to work with new design ([9fd52c8](https://github.com/IBM/unity-sdk-core/commit/9fd52c8))
+* **dynamicModel:** add dynamic model and meta files ([2b471aa](https://github.com/IBM/unity-sdk-core/commit/2b471aa))
+* **setServiceUrl:** use setServiceUrl instead of setServiceEndpoint ([2c33bf8](https://github.com/IBM/unity-sdk-core/commit/2c33bf8))
+* add model for file with metadata ([6b536d1](https://github.com/IBM/unity-sdk-core/commit/6b536d1))
+* **websocket-dll:** update websocket dll file to import from IBMCloud namespace ([d9b0bc9](https://github.com/IBM/unity-sdk-core/commit/d9b0bc9))
+
+
+### BREAKING CHANGES
+
+* **setServiceUrl:** Use SetServiceUrl to set the service endpoint rather than SetEndpoint
+
 # [0.2.0](https://github.com/IBM/unity-sdk-core/compare/v0.1.0...v0.2.0) (2019-06-29)
 
 
