@@ -293,7 +293,7 @@ namespace IBM.Cloud.SDK.Connection
         /// </summary>
         /// <param name="request">The request object.</param>
         /// <returns>true is returned on success, false is returned if the Request can't be sent.</returns>
-        public bool Send(Request request)
+        public virtual bool Send(Request request)
         {
             if (request == null)
             {
@@ -326,7 +326,7 @@ namespace IBM.Cloud.SDK.Connection
             {
                Headers = new Dictionary<string,string>();;
             }
-            Headers.Add(AUTHENTICATION_AUTHORIZATION_HEADER, string.Format("Bearer {0}", bearerToken));
+            Headers[AUTHENTICATION_AUTHORIZATION_HEADER] = string.Format("Bearer {0}", bearerToken);
         }
 
         /// <summary>
@@ -340,7 +340,7 @@ namespace IBM.Cloud.SDK.Connection
             {
                Headers = new Dictionary<string,string>();;
             }
-            Headers.Add(AUTHENTICATION_AUTHORIZATION_HEADER, Utility.CreateAuthorization(username, password));
+            Headers[AUTHENTICATION_AUTHORIZATION_HEADER] = Utility.CreateAuthorization(username, password);
         }
         #endregion
 
