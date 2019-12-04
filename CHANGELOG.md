@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/IBM/unity-sdk-core/compare/v1.1.0...v1.1.1) (2019-12-04)
+
+
+### Bug Fixes
+
+* do not throw error before setting defaulr url ([cb0f308](https://github.com/IBM/unity-sdk-core/commit/cb0f3085660e60ac130f3899a4e35aceb7c200dd))
+
 # [1.1.0](https://github.com/IBM/unity-sdk-core/compare/v1.0.0...v1.1.0) (2019-11-27)
 
 
