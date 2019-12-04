@@ -65,21 +65,19 @@ namespace IBM.Cloud.SDK
                 SetServiceUrl(url);
             }
 
-            if (string.IsNullOrEmpty(GetServiceUrl()))
-            {
-                throw new ArgumentNullException("The serviceUrl must not be empty or null.");
-            }
-
-            if (Utility.HasBadFirstOrLastCharacter(GetServiceUrl()))
-            {
-                throw new ArgumentException("The serviceUrl property is invalid. Please remove any surrounding {{, }}, or \" characters.");
-            }
-
             Connector = new RESTConnector();
         }
 
         public void SetServiceUrl(string url)
         {
+            if (string.IsNullOrEmpty(url))
+            {
+                throw new ArgumentNullException("The serviceUrl must not be empty or null.");
+            }
+            if (Utility.HasBadFirstOrLastCharacter(url))
+            {
+                throw new ArgumentException("The serviceUrl property is invalid. Please remove any surrounding {{, }}, or \" characters.");
+            }
             serviceUrl = url;
         }
 
