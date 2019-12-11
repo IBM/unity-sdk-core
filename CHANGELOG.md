@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/IBM/unity-sdk-core/compare/v1.1.1...v1.2.0) (2019-12-11)
+
+
+### Features
+
+* **IBMService:** enhance vcap parsing ([262fc55](https://github.com/IBM/unity-sdk-core/commit/262fc55a7fcbedc46a6e8afb3098c54fc6ea0355))
+
 ## [1.1.1](https://github.com/IBM/unity-sdk-core/compare/v1.1.0...v1.1.1) (2019-12-04)
 
 
