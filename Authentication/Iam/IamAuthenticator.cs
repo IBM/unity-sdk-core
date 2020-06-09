@@ -39,6 +39,7 @@ namespace IBM.Cloud.SDK.Authentication.Iam
         public Dictionary<string, string> Headers { get; set; }
         // This field holds an access token and its expiration time.
         private IamToken tokenData;
+        private bool isDoneInitializing = false;
 
         private const string DefaultIamUrl = "https://iam.cloud.ibm.com/identity/token";
         private const string GrantType = "grant_type";
@@ -111,6 +112,8 @@ namespace IBM.Cloud.SDK.Authentication.Iam
             get { return AuthTypeIam; }
         }
 
+        public override bool IsDoneInitializing => isDoneInitializing;
+
         /// <summary>
         /// Do we have TokenData?
         /// </summary>
@@ -139,6 +142,7 @@ namespace IBM.Cloud.SDK.Authentication.Iam
 
         private void OnGetToken(DetailedResponse<IamTokenResponse> response, IBMError error)
         {
+            isDoneInitializing = true;
             if (error != null)
             {
                 Log.Error("Credentials.OnRequestIamTokenResponse()", "Exception: {0}", error.ToString());
@@ -200,14 +204,15 @@ namespace IBM.Cloud.SDK.Authentication.Iam
         {
             DetailedResponse<IamTokenResponse> response = new DetailedResponse<IamTokenResponse>();
             response.Result = new IamTokenResponse();
-            foreach (KeyValuePair<string, string> kvp in resp.Headers)
-            {
-                response.Headers.Add(kvp.Key, kvp.Value);
-            }
-            response.StatusCode = resp.HttpResponseCode;
 
             try
             {
+                foreach (KeyValuePair<string, string> kvp in resp.Headers)
+                {
+                    response.Headers.Add(kvp.Key, kvp.Value);
+                }
+                response.StatusCode = resp.HttpResponseCode;
+
                 string json = Encoding.UTF8.GetString(resp.Data);
                 response.Result = JsonConvert.DeserializeObject<IamTokenResponse>(json);
                 response.Response = json;
