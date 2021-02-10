@@ -1,5 +1,5 @@
 {
-  "branch": "master",
+  "branches": "main",
   "debug": true,
   "verifyConditions": ["@semantic-release/changelog", "@semantic-release/git"],
   "plugins": [
