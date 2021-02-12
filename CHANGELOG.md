@@ -1,3 +1,12 @@
+## [1.2.2](https://github.com/IBM/unity-sdk-core/compare/v1.2.1...v1.2.2) (2021-02-12)
+
+
+### Bug Fixes
+
+* **build:** main migration ([5daafd1](https://github.com/IBM/unity-sdk-core/commit/5daafd11c18abb40149ed2a3ba40d784aed6891f))
+* **build:** main migration automation ([e2ef3d8](https://github.com/IBM/unity-sdk-core/commit/e2ef3d8df786805dfd090b2048551edd928a3aa2))
+* **build:** main migration automation ([82e29a1](https://github.com/IBM/unity-sdk-core/commit/82e29a10c9b2ebcce1e240835780412a0d823cb1))
+
 ## [1.2.1](https://github.com/IBM/unity-sdk-core/compare/v1.2.0...v1.2.1) (2020-06-16)
 
 
