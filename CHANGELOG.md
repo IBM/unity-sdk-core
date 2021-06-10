@@ -1,3 +1,10 @@
+## [1.2.4](https://github.com/IBM/unity-sdk-core/compare/v1.2.3...v1.2.4) (2021-06-10)
+
+
+### Bug Fixes
+
+* **rest-connector:** allow sending formdata on put request ([c9a0932](https://github.com/IBM/unity-sdk-core/commit/c9a09321bbe17bafe7b9c83037338f117efa0516))
+
 ## [1.2.3](https://github.com/IBM/unity-sdk-core/compare/v1.2.2...v1.2.3) (2021-05-12)
 
 
