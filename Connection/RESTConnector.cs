@@ -488,6 +488,10 @@ namespace IBM.Cloud.SDK.Connection
                             Log.Error("RESTConnector.ProcessRequestQueue()", "Exception when initializing WWWForm: {0}", e.ToString());
                         }
                         unityWebRequest = UnityWebRequest.Post(url, form);
+                        if (req.HttpMethod == UnityWebRequest.kHttpVerbPUT) 
+                        {
+                            unityWebRequest.method = "PUT";
+                        }
                     }
                     else if (req.Send != null)
                     {
