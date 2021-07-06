@@ -55,6 +55,12 @@ namespace IBM.Cloud.SDK.Authentication
         virtual public string AuthenticationType { get; }
 
         /// <summary>
+        /// Returns true when the initialization phase is done, regardless whether it succeeded or not.
+        /// Override to indicate if the authenticator is still waiting for a token.
+        /// </summary>
+        virtual public bool IsDoneInitializing => true;
+
+        /// <summary>
         /// Check if authenticator has everything it needs to authenticate. Every child class overrides this method.
         /// </summary>
         virtual public bool CanAuthenticate() {

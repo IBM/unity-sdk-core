@@ -662,7 +662,16 @@ namespace IBM.Cloud.SDK.Connection
         #region Get Error Message
         public string GetErrorMessage(string error)
         {
-            dynamic deserializedObject = Json.Deserialize(error);
+            dynamic deserializedObject;
+            try
+            {
+                deserializedObject = Json.Deserialize(error);
+            }
+            catch (Exception)
+            {
+                Log.Error("RESTConnector.GetErrorMessage()", "Non-JSON Error Received!");
+                return "Unknown error";
+            }
             if ((deserializedObject as Dictionary<string, object>).ContainsKey("errors"))
             {
                 return deserializedObject["errors"][0]["message"];

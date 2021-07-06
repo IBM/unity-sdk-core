@@ -42,6 +42,9 @@ namespace IBM.Cloud.SDK.Authentication.Cp4d
 
         // This field holds an access token and its expiration time.
         private CloudPakForDataToken tokenData;
+        private bool isDoneInitializing = false;
+
+        public override bool IsDoneInitializing => isDoneInitializing;
 
         /// <summary>
         /// Constructs a CloudPakForDataAuthenticator with all properties.
@@ -131,6 +134,7 @@ namespace IBM.Cloud.SDK.Authentication.Cp4d
 
         private void OnGetToken(DetailedResponse<CloudPakForDataTokenResponse> response, IBMError error)
         {
+            isDoneInitializing = true;
             if (error != null)
             {
                 Log.Error("Credentials.OnRequestCloudPakForDataTokenResponse()", "Exception: {0}", error.ToString());
