@@ -26,22 +26,8 @@ namespace IBM.Cloud.SDK.Authentication.Cp4d
     /// </summary>
     public class CloudPakForDataTokenResponse
     {
-        [JsonProperty("username", NullValueHandling = NullValueHandling.Ignore)]
-        public string Username { get; set; }
-        [JsonProperty("role", NullValueHandling = NullValueHandling.Ignore)]
-        public string Role { get; set; }
-        [JsonProperty("permissions", NullValueHandling = NullValueHandling.Ignore)]
-        public List<string> Permissions { get; set; }
-        [JsonProperty("sub", NullValueHandling = NullValueHandling.Ignore)]
-        public string Sub { get; set; }
-        [JsonProperty("iss", NullValueHandling = NullValueHandling.Ignore)]
-        public string Iss { get; set; }
-        [JsonProperty("aud", NullValueHandling = NullValueHandling.Ignore)]
-        public string Aud { get; set; }
-        [JsonProperty("uid", NullValueHandling = NullValueHandling.Ignore)]
-        public string Uid { get; set; }
-        [JsonProperty("accessToken", NullValueHandling = NullValueHandling.Ignore)]
-        public string AccessToken { get; set; }
+        [JsonProperty("token", NullValueHandling = NullValueHandling.Ignore)]
+        public string Token { get; set; }
         [JsonProperty("_messageCode_", NullValueHandling = NullValueHandling.Ignore)]
         public string MessageCode { get; set; }
         [JsonProperty("message", NullValueHandling = NullValueHandling.Ignore)]

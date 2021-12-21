@@ -42,7 +42,7 @@ namespace IBM.Cloud.SDK.Authentication.Cp4d
 
         public CloudPakForDataToken(CloudPakForDataTokenResponse response)
         {
-            AccessToken = response.AccessToken;
+            AccessToken = response.Token;
             long? iat = null;
             long? exp = null;
 

@@ -31,6 +31,7 @@ using Newtonsoft.Json;
 using MiniJSON;
 using IBM.Cloud.SDK.Authentication;
 using Utility = IBM.Cloud.SDK.Utilities.Utility;
+using System.Net.Http;
 
 #if !NETFX_CORE
 using System.Net;
@@ -457,6 +458,7 @@ namespace IBM.Cloud.SDK.Connection
                         }
 
                         WWWForm form = new WWWForm();
+                        JObject bodyObject = new JObject();
                         try
                         {
                             foreach (var formData in req.Forms)
@@ -464,33 +466,38 @@ namespace IBM.Cloud.SDK.Connection
                                 if (formData.Value.IsBinary)
                                 {
                                     form.AddBinaryData(formData.Key, formData.Value.Contents, formData.Value.FileName, formData.Value.MimeType);
+                                    bodyObject[formData.Key] = formData.Value.Contents;
                                 }
                                 else if (formData.Value.BoxedObject is string)
                                 {
                                     form.AddField(formData.Key, (string)formData.Value.BoxedObject);
+                                    bodyObject[formData.Key] = (string)formData.Value.BoxedObject;
                                 }
                                 else if (formData.Value.BoxedObject is int)
                                 {
                                     form.AddField(formData.Key, (int)formData.Value.BoxedObject);
+                                    bodyObject[formData.Key] = (int)formData.Value.BoxedObject;
                                 }
                                 else if (formData.Value.BoxedObject != null)
                                 {
                                     Log.Warning("RESTConnector.ProcessRequestQueue()", "Unsupported form field type {0}", formData.Value.BoxedObject.GetType().ToString());
                                 }
                             }
-                            foreach (var headerData in form.headers)
-                            {
-                                req.Headers[headerData.Key] = headerData.Value;
-                            }
                         }
                         catch (Exception e)
                         {
                             Log.Error("RESTConnector.ProcessRequestQueue()", "Exception when initializing WWWForm: {0}", e.ToString());
                         }
-                        unityWebRequest = UnityWebRequest.Post(url, form);
                         if (req.HttpMethod == UnityWebRequest.kHttpVerbPUT) 
                         {
+                            unityWebRequest = UnityWebRequest.Post(url, form);   
                             unityWebRequest.method = "PUT";
+                        }
+                        else
+                        {
+                            var httpContent = bodyObject.ToString();
+                            unityWebRequest = UnityWebRequest.Put(url, httpContent);     
+                            unityWebRequest.method = "POST";
                         }
                     }
                     else if (req.Send != null)
@@ -596,6 +603,11 @@ namespace IBM.Cloud.SDK.Connection
                     }
 
                     string errorMessage = GetErrorMessage(unityWebRequest.downloadHandler.text);
+                    
+                    if (errorMessage.Equals(""))
+                    {
+                        errorMessage = unityWebRequest.error;
+                    }
 
                     error = new IBMError()
                     {
@@ -663,6 +675,12 @@ namespace IBM.Cloud.SDK.Connection
         public string GetErrorMessage(string error)
         {
             dynamic deserializedObject = Json.Deserialize(error);
+            
+            if (!(deserializedObject is Dictionary<string, object>)) 
+            {
+                return "";
+            }
+
             if ((deserializedObject as Dictionary<string, object>).ContainsKey("errors"))
             {
                 return deserializedObject["errors"][0]["message"];
