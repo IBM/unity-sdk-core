@@ -232,7 +232,14 @@ namespace IBM.Cloud.SDK.Authentication.Cp4d
                 throw new ArgumentNullException("successCallback");
 
             RESTConnector connector = new RESTConnector();
-            connector.URL = Url + UrlSuffix;
+            
+            connector.URL = Url;
+            
+            if (!Url.Contains(UrlSuffix))
+            {
+                connector.URL = connector.URL + UrlSuffix;
+            }
+            
             if (connector == null)
                 return false;
 
@@ -245,7 +252,7 @@ namespace IBM.Cloud.SDK.Authentication.Cp4d
 
             req.Forms = new Dictionary<string, RESTConnector.Form>();
             req.Forms[KeyUsername] = new RESTConnector.Form(Username);
-            
+
             if (string.IsNullOrEmpty(Password))
             {
                 req.Forms[KeyApikey] = new RESTConnector.Form(Apikey);
