@@ -494,7 +494,7 @@ namespace IBM.Cloud.SDK.Connection
                             unityWebRequest = UnityWebRequest.Post(url, form);   
                             unityWebRequest.method = "PUT";
                         }
-                        else if(req.HttpMethod == UnityWebRequest.kHttpVerbPOST)
+                        else if (req.HttpMethod == UnityWebRequest.kHttpVerbPOST)
                         {
                             var httpContent = bodyObject.ToString();
                             unityWebRequest = UnityWebRequest.Put(url, httpContent);     
